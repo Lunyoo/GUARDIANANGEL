@@ -1,0 +1,274 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database - Banco único para toda aplicação
+  postgres:
+    image: postgres:15-alpine
+    container_name: nexus-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-nexus_db}
+      POSTGRES_USER: ${POSTGRES_USER:-nexus_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-nexus_secure_password_2024}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - nexus-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-nexus_user} -d ${POSTGRES_DB:-nexus_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    profiles: ["full", "backend-only"]
+
+  # Redis Cache & Queue - Único redis com configuração consistente
+  redis:
+    image: redis:7-alpine
+    container_name: nexus-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes ${REDIS_PASSWORD:+--requirepass $REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - nexus-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    profiles: ["full", "backend-only"]
+
+  # Frontend React/Vite - Modo desenvolvimento com bind mount otimizado
+  frontend:
+    build: 
+      context: .
+      dockerfile: Dockerfile.frontend
+      target: ${BUILD_TARGET:-development}
+    container_name: nexus-frontend
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    volumes:
+      # Bind mount otimizado - apenas código fonte necessário
+      - ./src:/app/src:ro
+      - ./public:/app/public:ro
+      - ./index.html:/app/index.html:ro
+      - ./vite.config.ts:/app/vite.config.ts:ro
+      - ./tsconfig.json:/app/tsconfig.json:ro
+      - ./tailwind.config.js:/app/tailwind.config.js:ro
+      - ./package.json:/app/package.json:ro
+      # Volume anônimo para node_modules
+      - /app/node_modules
+    environment:
+      - NODE_ENV=${NODE_ENV:-development}
+      - VITE_API_URL=http://localhost:${BACKEND_PORT:-3001}
+      - VITE_ML_SERVICE_URL=http://localhost:${ML_SERVICE_PORT:-8000}
+      - VITE_SCRAPING_SERVICE_URL=http://localhost:${SCRAPING_SERVICE_PORT:-8080}
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    command: npm run dev
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - nexus-network
+    profiles: ["full", "dev"]
+
+  # Frontend Production - Modo produção otimizado
+  frontend-prod:
+    build: 
+      context: .
+      dockerfile: Dockerfile.frontend
+      target: production
+    container_name: nexus-frontend-prod
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    environment:
+      - NODE_ENV=production
+      - VITE_API_URL=http://localhost:${BACKEND_PORT:-3001}
+      - VITE_ML_SERVICE_URL=http://localhost:${ML_SERVICE_PORT:-8000}
+      - VITE_SCRAPING_SERVICE_URL=http://localhost:${SCRAPING_SERVICE_PORT:-8080}
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - nexus-network
+    profiles: ["prod"]
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+
+  # Backend Node.js/Express - Configuração unificada
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+      target: ${BUILD_TARGET:-development}
+    container_name: nexus-backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=${NODE_ENV:-development}
+      - PORT=${BACKEND_PORT:-3001}
+      # Postgres como banco único
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-nexus_user}:${POSTGRES_PASSWORD:-nexus_secure_password_2024}@postgres:5432/${POSTGRES_DB:-nexus_db}?schema=public
+      - REDIS_URL=redis://redis:6379${REDIS_PASSWORD:+?password=$REDIS_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET:-nexus_jwt_secret_ultra_secure_2024_change_in_production}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-7d}
+      # URLs dos serviços internos (rede Docker)
+      - ML_SERVICE_URL=http://ml-service:${ML_SERVICE_INTERNAL_PORT:-8000}
+      - SCRAPER_SERVICE_URL=http://scraping-service:${SCRAPING_SERVICE_INTERNAL_PORT:-8080}
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-alexvinitius@gmail.com}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    volumes:
+      # Development bind mounts
+      - ./backend:/app:${BIND_MOUNT_MODE:-ro}
+      - /app/node_modules
+      # Logs persistentes
+      - backend_logs:/usr/src/app/logs
+    ports:
+      - "${BACKEND_PORT:-3001}:${BACKEND_PORT:-3001}"
+    networks:
+      - nexus-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${BACKEND_PORT:-3001}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    command: >
+      sh -c "
+        if [ \"$$NODE_ENV\" = \"production\" ]; then
+          npm run prisma:push &&
+          npm run seed &&
+          npm start
+        else
+          npm run dev
+        fi
+      "
+    profiles: ["full", "backend-only"]
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+
+  # ML Service (Python) - Configuração corrigida
+  ml-service:
+    build:
+      context: ./ml-service
+      dockerfile: Dockerfile
+    container_name: nexus-ml-service
+    restart: unless-stopped
+    environment:
+      - PYTHONPATH=/app
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - REDIS_URL=redis://redis:6379${REDIS_PASSWORD:+?password=$REDIS_PASSWORD}
+      # Conexão correta com Postgres
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-nexus_user}:${POSTGRES_PASSWORD:-nexus_secure_password_2024}@postgres:5432/${POSTGRES_DB:-nexus_db}
+      - BACKEND_URL=http://backend:${BACKEND_PORT:-3001}
+    volumes:
+      # Modelos ML persistentes
+      - ml_models:/app/models
+      # Development bind mount
+      - ./ml-service:/app:${ML_BIND_MOUNT_MODE:-ro}
+    ports:
+      - "${ML_SERVICE_PORT:-8000}:${ML_SERVICE_INTERNAL_PORT:-8000}"
+    networks:
+      - nexus-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${ML_SERVICE_INTERNAL_PORT:-8000}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    profiles: ["full", "backend-only"]
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.5'
+
+  # Scraping Service (Python) - Playwright unificado
+  scraping-service:
+    build:
+      context: ./scraping-service
+      dockerfile: Dockerfile
+    container_name: nexus-scraping-service
+    restart: unless-stopped
+    environment:
+      - PYTHONPATH=/app
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - REDIS_URL=redis://redis:6379${REDIS_PASSWORD:+?password=$REDIS_PASSWORD}
+      # Conexão correta com Postgres
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-nexus_user}:${POSTGRES_PASSWORD:-nexus_secure_password_2024}@postgres:5432/${POSTGRES_DB:-nexus_db}
+      - BACKEND_URL=http://backend:${BACKEND_PORT:-3001}
+      - HEADLESS=${HEADLESS:-true}
+      - BROWSER_ARGS=${BROWSER_ARGS:---no-sandbox --disable-setuid-sandbox --disable-gpu}
+    volumes:
+      # Dados de scraping persistentes
+      - scraper_data:/app/data
+      # Development bind mount
+      - ./scraping-service:/app:${SCRAPING_BIND_MOUNT_MODE:-ro}
+    ports:
+      - "${SCRAPING_SERVICE_PORT:-8080}:${SCRAPING_SERVICE_INTERNAL_PORT:-8080}"
+    networks:
+      - nexus-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${SCRAPING_SERVICE_INTERNAL_PORT:-8080}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    profiles: ["full", "backend-only"]
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+
+networks:
+  nexus-network:
+    name: nexus-network
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+    name: nexus_postgres_data
+  redis_data:
+    driver: local
+    name: nexus_redis_data
+  backend_logs:
+    driver: local
+    name: nexus_backend_logs
+  ml_models:
+    driver: local
+    name: nexus_ml_models
+  scraper_data:
+    driver: local
+    name: nexus_scraper_data

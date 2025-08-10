@@ -1,0 +1,158 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: nexus-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: nexus_db
+      POSTGRES_USER: nexus_user
+      POSTGRES_PASSWORD: nexus_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - nexus-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nexus_user -d nexus_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache & Queue
+  redis:
+    image: redis:7-alpine
+    container_name: nexus-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-}
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - nexus-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Main Backend API
+  backend:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: nexus-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DATABASE_URL: postgresql://nexus_user:nexus_password@postgres:5432/nexus_db?schema=public
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      FACEBOOK_ACCESS_TOKEN: ${FACEBOOK_ACCESS_TOKEN}
+      FACEBOOK_AD_ACCOUNT_ID: ${FACEBOOK_AD_ACCOUNT_ID}
+      FACEBOOK_APP_ID: ${FACEBOOK_APP_ID}
+      FACEBOOK_APP_SECRET: ${FACEBOOK_APP_SECRET}
+      KIWIFY_CLIENT_ID: ${KIWIFY_CLIENT_ID}
+      KIWIFY_CLIENT_SECRET: ${KIWIFY_CLIENT_SECRET}
+      IDEOGRAM_API_KEY: ${IDEOGRAM_API_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ML_SERVICE_URL: http://ml-service:8001
+      SCRAPER_SERVICE_URL: http://scraper-service:8002
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-alexvinitius@gmail.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123456}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    volumes:
+      - backend_logs:/usr/src/app/logs
+    ports:
+      - "3001:3001"
+    networks:
+      - nexus-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    command: >
+      sh -c "
+        npm run prisma:push &&
+        npm run seed &&
+        npm start
+      "
+
+  # ML Service (Python)
+  ml-service:
+    build:
+      context: ./ml-service
+      dockerfile: Dockerfile
+    container_name: nexus-ml-service
+    restart: unless-stopped
+    environment:
+      PYTHONPATH: /app
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      REDIS_URL: redis://redis:6379
+    volumes:
+      - ml_models:/app/models
+    ports:
+      - "8001:8001"
+    networks:
+      - nexus-network
+    depends_on:
+      - redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Scraper Service (Python)
+  scraper-service:
+    build:
+      context: ./scraper-service
+      dockerfile: Dockerfile
+    container_name: nexus-scraper-service
+    restart: unless-stopped
+    environment:
+      PYTHONPATH: /app
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      REDIS_URL: redis://redis:6379
+      HEADLESS: true
+    volumes:
+      - scraper_data:/app/data
+    ports:
+      - "8002:8002"
+    networks:
+      - nexus-network
+    depends_on:
+      - redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  nexus-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  backend_logs:
+    driver: local
+  ml_models:
+    driver: local
+  scraper_data:
+    driver: local

@@ -1,0 +1,21 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist"
+  },
+  "include": [
+    "src/server.ts",
+    "src/config/**/*.ts",
+    "src/middleware/**/*.ts",
+    "src/routes/public.ts",
+  "src/services/attributionForwarder.ts",
+  "src/services/capiQueue.ts"
+  ],
+  "exclude": [
+    "src/controllers/**/*",
+    "src/services/queue.ts",
+    "src/routes/automacao.ts",
+    "src/routes/automation.ts",
+    "src/routes/campanhas.ts"
+  ]
+}

@@ -1,0 +1,88 @@
+# Dockerfile multi-stage otimizado para Frontend
+FROM node:18-alpine AS base
+WORKDIR /app
+
+# Instalar dependências básicas
+RUN apk add --no-cache curl
+
+# Copiar arquivos de configuração
+COPY package*.json ./
+COPY vite.config.ts tsconfig.json tailwind.config.js ./
+
+# Stage de desenvolvimento
+FROM base AS development
+# Instalar todas as dependências (incluindo devDependencies)
+RUN npm ci --include=dev
+
+# Copiar código fonte
+COPY . .
+
+# Expor porta
+EXPOSE 3000
+
+# Comando de desenvolvimento com hot reload
+CMD ["npm", "run", "dev"]
+
+# Stage de build para produção
+FROM base AS builder
+# Instalar todas as dependências para build
+RUN npm ci --include=dev
+
+# Copiar código fonte
+COPY . .
+
+# Build da aplicação
+RUN npm run build
+
+# Stage de produção
+FROM nginx:alpine AS production
+# Copiar configuração customizada do nginx
+COPY <<EOF /etc/nginx/nginx.conf
+events {
+    worker_connections 1024;
+}
+
+http {
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+    
+    # Gzip compression
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+    
+    server {
+        listen 80;
+        server_name localhost;
+        root /usr/share/nginx/html;
+        index index.html;
+
+        # Handle React Router
+        location / {
+            try_files \$uri \$uri/ /index.html;
+        }
+
+        # Static assets caching
+        location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2)$ {
+            expires 1y;
+            add_header Cache-Control "public, immutable";
+        }
+
+        # Security headers
+        add_header X-Frame-Options DENY;
+        add_header X-Content-Type-Options nosniff;
+        add_header X-XSS-Protection "1; mode=block";
+    }
+}
+EOF
+
+# Copiar arquivos buildados
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost/ || exit 1
+
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

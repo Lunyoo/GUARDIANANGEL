@@ -1,0 +1,109 @@
+services:
+  # Frontend React/Vite
+  frontend:
+    build: 
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: nexus_frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=http://localhost:3001
+      - VITE_ML_SERVICE_URL=http://localhost:8000
+      - VITE_SCRAPING_SERVICE_URL=http://localhost:8080
+    depends_on:
+      - backend
+      - ml-service
+      - scraping-service
+    restart: unless-stopped
+    command: npm run dev
+
+  # Backend Node.js/Express
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: nexus_backend
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - DATABASE_URL=file:./database.db
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=nexus_jwt_secret_key_ultra_secure_2024
+      - FACEBOOK_ACCESS_TOKEN=${FACEBOOK_ACCESS_TOKEN}
+      - FACEBOOK_AD_ACCOUNT_ID=${FACEBOOK_AD_ACCOUNT_ID}
+      - FACEBOOK_APP_ID=${FACEBOOK_APP_ID}
+      - FACEBOOK_APP_SECRET=${FACEBOOK_APP_SECRET}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - IDEOGRAM_API_KEY=${IDEOGRAM_API_KEY}
+      - KIWIFY_CLIENT_ID=${KIWIFY_CLIENT_ID}
+      - KIWIFY_CLIENT_SECRET=${KIWIFY_CLIENT_SECRET}
+    depends_on:
+      - redis
+    restart: unless-stopped
+    command: npm run dev
+
+  # Serviço de Machine Learning (Python)
+  ml-service:
+    build: 
+      context: ./ml-service
+      dockerfile: Dockerfile
+    container_name: nexus_ml_service
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./ml-service:/app
+      - ./ml-service/models:/app/models
+    environment:
+      - PYTHONPATH=/app
+      - DATABASE_URL=../backend/database.db
+    restart: unless-stopped
+    
+
+  # Serviço de Scraping (Python)
+  scraping-service:
+    build: 
+      context: ./scraping-service
+      dockerfile: Dockerfile
+    container_name: nexus_scraping_service
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./scraping-service:/app
+      - ./backend:/shared_data
+    environment:
+      - PYTHONPATH=/app
+      - DATABASE_URL=../backend/database.db
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - redis
+      - backend
+    restart: unless-stopped
+    
+
+  # Redis para cache e filas
+  redis:
+    image: redis:7.2-alpine
+    container_name: nexus_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+
+volumes:
+  redis_data:
+
+networks:
+  default:
+    name: nexus_network

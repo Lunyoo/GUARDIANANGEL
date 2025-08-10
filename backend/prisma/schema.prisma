@@ -1,0 +1,222 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String   @id @default(uuid())
+  email             String   @unique
+  password          String
+  name              String?
+  avatarUrl         String?
+  isAdmin           Boolean  @default(false)
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // API Configuration
+  facebookToken     String?
+  adAccountId       String?
+  facebookAppId     String?
+  facebookAppSecret String?
+  kiwifyClientId    String?
+  kiwifyClientSecret String?
+  kiwifyAccessToken String?
+  ideogramToken     String?
+  
+  // Relacionamentos
+  campaigns         Campaign[]
+  creatives         Creative[]
+  automationLogs    AutomationLog[]
+  scrapingResults   ScrapingResult[]
+  
+  @@map("users")
+}
+
+model Campaign {
+  id              String   @id @default(uuid())
+  facebookId      String?  @unique
+  name            String
+  status          String   @default("DRAFT") // DRAFT, ACTIVE, PAUSED, ARCHIVED
+  objective       String?
+  budget          Float    @default(0)
+  budgetType      String?  // DAILY, LIFETIME
+  startDate       DateTime?
+  endDate         DateTime?
+  
+  // Métricas
+  impressions     Int      @default(0)
+  clicks          Int      @default(0)
+  conversions     Int      @default(0)
+  spend           Float    @default(0)
+  ctr             Float    @default(0)
+  cpc             Float    @default(0)
+  cpm             Float    @default(0)
+  roas            Float    @default(0)
+  
+  // Dados extras
+  targeting       Json?
+  insights        Json?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relacionamentos
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  creatives       Creative[]
+  automationLogs  AutomationLog[]
+  
+  @@map("campaigns")
+}
+
+model Creative {
+  id              String   @id @default(uuid())
+  facebookId      String?  @unique
+  campaignId      String?
+  name            String
+  status          String   @default("DRAFT") // DRAFT, ACTIVE, PAUSED, ARCHIVED
+  adType          String?  // IMAGE, VIDEO, CAROUSEL, etc
+  
+  // Conteúdo
+  headline        String?
+  description     String?
+  bodyText        String?
+  callToAction    String?
+  imageUrl        String?
+  videoUrl        String?
+  linkUrl         String?
+  
+  // Métricas
+  impressions     Int      @default(0)
+  clicks          Int      @default(0)
+  conversions     Int      @default(0)
+  spend           Float    @default(0)
+  ctr             Float    @default(0)
+  cpc             Float    @default(0)
+  cpm             Float    @default(0)
+  roas            Float    @default(0)
+  
+  // IA Data
+  aiGenerated     Boolean  @default(false)
+  aiPrompt        String?
+  aiScore         Float?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relacionamentos
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  campaign        Campaign? @relation(fields: [campaignId], references: [id])
+  
+  @@map("creatives")
+}
+
+model ScrapingResult {
+  id              String   @id @default(uuid())
+  niche           String
+  adType          String   // GREY, BLACK, WHITE
+  status          String   @default("PENDING") // PENDING, PROCESSING, COMPLETED, FAILED
+  
+  // Dados do anúncio encontrado
+  advertiserName  String?
+  adText          String?
+  headline        String?
+  description     String?
+  imageUrl        String?
+  videoUrl        String?
+  linkUrl         String?
+  landingPageUrl  String?
+  
+  // Métricas estimadas
+  estimatedImpressions Int?
+  estimatedClicks      Int?
+  estimatedSpend       Float?
+  successScore         Float?
+  confidenceLevel      Float?
+  
+  // Dados brutos
+  rawData         Json?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relacionamentos
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  
+  @@map("scraping_results")
+}
+
+model AutomationLog {
+  id              String   @id @default(uuid())
+  type            String   // SCRAPING, ML_ANALYSIS, CAMPAIGN_CREATION, CREATIVE_GENERATION, etc
+  status          String   // PENDING, PROCESSING, COMPLETED, FAILED
+  action          String
+  details         Json?
+  
+  // Input/Output data
+  inputData       Json?
+  outputData      Json?
+  errorMessage    String?
+  
+  // Timing
+  startedAt       DateTime @default(now())
+  completedAt     DateTime?
+  duration        Int?     // em milissegundos
+  
+  // Relacionamentos
+  userId          String?
+  user            User?    @relation(fields: [userId], references: [id])
+  campaignId      String?
+  campaign        Campaign? @relation(fields: [campaignId], references: [id])
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("automation_logs")
+}
+
+model MLModel {
+  id              String   @id @default(uuid())
+  name            String
+  version         String
+  type            String   // PERFORMANCE_PREDICTION, CREATIVE_ANALYSIS, etc
+  status          String   @default("TRAINING") // TRAINING, READY, DEPRECATED
+  
+  // Model data
+  modelPath       String?
+  accuracy        Float?
+  trainingData    Json?
+  parameters      Json?
+  
+  // Métricas de uso
+  predictionsCount Int     @default(0)
+  lastUsed        DateTime?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("ml_models")
+}
+
+model SystemConfig {
+  id              String   @id @default(uuid())
+  key             String   @unique
+  value           String
+  description     String?
+  isPublic        Boolean  @default(false)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("system_config")
+}
