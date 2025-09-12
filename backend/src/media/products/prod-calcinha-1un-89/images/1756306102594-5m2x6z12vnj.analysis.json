@@ -1,0 +1,23 @@
+{
+  "category": "before_after",
+  "subcategory": "comparação de modelagem",
+  "colors": [
+    "azul"
+  ],
+  "features": [
+    "modelagem",
+    "ajuste"
+  ],
+  "context": "demonstrar eficácia do produto",
+  "confidence": 0.95,
+  "tags": [
+    "antes e depois",
+    "modelagem",
+    "ajuste"
+  ],
+  "description": "Comparação visual do efeito da calcinha modeladora em um vestido azul.",
+  "recommendedFor": [
+    "promoções",
+    "demonstração de resultados"
+  ]
+}

@@ -131,7 +131,7 @@ export default function ProdutosKiwify() {
               <Package className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
               <h4 className="font-medium mb-2">Nenhum produto encontrado</h4>
               <p className="text-sm text-muted-foreground mb-4">
-                Execute a Automação Master para criar produtos automaticamente
+                Nenhum produto encontrado. Use as integrações para criar produtos automaticamente.
               </p>
             </CardContent>
           </Card>

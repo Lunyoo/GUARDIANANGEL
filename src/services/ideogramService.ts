@@ -49,7 +49,8 @@ export default class IdeogramService {
         })
         if (resp.ok) {
           const data = await resp.json()
-          const url = data?.data?.url || data?.data?.image_url || this.gerarURLSimulada(config)
+          const url = data?.data?.url || data?.data?.image_url
+          if (!url) throw new Error('Ideogram não retornou URL de imagem')
       return {
             url,
             prompt,
@@ -68,7 +69,7 @@ export default class IdeogramService {
       throw e
     }
 
-    // If reached, proxy did not return ok; enforce no simulation
+  // If reached, proxy did not return ok; enforce no simulation
     throw new Error('Ideogram generation failed without fallback')
   }
 
@@ -92,17 +93,7 @@ export default class IdeogramService {
       
       const prompt = this.construirPrompt(varianteConfig, i + 1)
       
-      variantes.push({
-        url: this.gerarURLSimulada(varianteConfig, i + 1),
-        prompt,
-        custoCreditos: 1, // Variantes custam menos
-        metadata: {
-          largura: this.obterDimensoes(config.proporcao).largura,
-          altura: this.obterDimensoes(config.proporcao).altura,
-          formato: 'PNG',
-          tamanho: Math.floor(Math.random() * 1500000) + 300000
-        }
-      })
+  throw new Error('Ideogram variants require API; nenhuma variante gerada sem API')
     }
 
     console.log(`✅ ${variantes.length} variantes geradas`)
@@ -190,20 +181,7 @@ export default class IdeogramService {
     return prompt
   }
 
-  /**
-   * Gerar URL simulada para o criativo
-   */
-  private gerarURLSimulada(config: CriativoConfig, variante?: number): string {
-    // Em um ambiente real, isso seria a URL retornada pela API do Ideogram
-    const seed = `${config.produto}-${config.estilo}-${config.nicho}${variante ? `-v${variante}` : ''}`
-    const hash = btoa(seed).replace(/[^a-zA-Z0-9]/g, '').substring(0, 10)
-    
-    // Usar serviço de imagens placeholder por enquanto
-    const dimensoes = this.obterDimensoes(config.proporcao)
-    const cor = config.cores[0]?.replace('#', '') || '007bff'
-    
-    return `https://via.placeholder.com/${dimensoes.largura}x${dimensoes.altura}/${cor}/ffffff.png?text=${encodeURIComponent(config.produto)}`
-  }
+  // remover geracao de URL simulada; exigir API real
 
   /**
    * Obter dimensões baseadas na proporção

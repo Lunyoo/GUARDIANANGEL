@@ -72,46 +72,6 @@ export interface Creative {
   userId: string
 }
 
-export interface ScrapingResult {
-  id: string
-  niche: string
-  adType: string
-  status: string
-  advertiserName?: string | null
-  adText?: string | null
-  headline?: string | null
-  description?: string | null
-  imageUrl?: string | null
-  videoUrl?: string | null
-  linkUrl?: string | null
-  landingPageUrl?: string | null
-  estimatedImpressions?: number | null
-  estimatedClicks?: number | null
-  estimatedSpend?: number | null
-  successScore?: number | null
-  confidenceLevel?: number | null
-  rawData?: any
-  createdAt: Date
-  updatedAt: Date
-  userId: string
-}
-
-export interface AutomationLog {
-  id: string
-  type: string
-  status: string
-  action: string
-  details?: any
-  inputData?: any
-  outputData?: any
-  errorMessage?: string | null
-  startedAt: Date
-  completedAt?: Date | null
-  duration?: number | null
-  userId?: string | null
-  campaignId?: string | null
-}
-
 export interface MLModel {
   id: string
   name: string
@@ -217,22 +177,6 @@ export interface MLPredictionResponse {
   confidence?: number
   modelVersion?: string
   features?: Record<string, any>
-}
-
-// Scraping types
-export interface ScrapingRequest {
-  niche: string
-  adType: 'GREY' | 'BLACK' | 'WHITE'
-  maxResults?: number
-  filters?: Record<string, any>
-}
-
-export interface ScrapingJobStatus {
-  id: string
-  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED'
-  progress?: number
-  results?: ScrapingResult[]
-  error?: string
 }
 
 // Queue types

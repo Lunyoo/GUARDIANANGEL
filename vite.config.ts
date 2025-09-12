@@ -13,7 +13,38 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-  '@': `/src`
+      '@': `/src`
     }
+  },
+  server: {
+    // Prevent HMR reload storms caused by WhatsApp auth/session files and logs changing constantly
+    watch: {
+      ignored: [
+        // Ignore the entire backend folder to avoid client reloads from auth session churn & logs
+        'backend/**',
+        '**/backend/**',
+        // Specific dot-auth/session dirs (in case of symlinks or alternate paths)
+        '**/backend/.wa-auth/**',
+        '**/backend/.wwebjs_auth/**',
+        '**/.wwebjs_auth/**',
+        // Logs and tmp
+        '**/backend/logs/**',
+        '**/backend/**/logs/**',
+        '**/backend/tmp/**',
+        '**/backend/**/tmp/**',
+        // SQLite files
+        '**/*.db',
+        '**/*.db-*',
+        // Fallback guard via function matcher
+        ((path: string) => /\/backend\//.test(path) || /backend\/.+/.test(path)) as unknown as string,
+      ] as unknown as any,
+    },
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
 });

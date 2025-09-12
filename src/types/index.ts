@@ -11,6 +11,44 @@ export interface Usuario {
   criadoEm: string
 }
 
+export interface RealScrapedOffer {
+  id: string
+  title: string
+  niche: string
+  platform: string
+  advertiser: string
+  adCopy: string
+  imageUrl?: string
+  videoUrl?: string
+  landingPageUrl: string
+  estimatedBudget: number
+  engagement: {
+    ctr?: number
+    comments?: number
+    shares?: number
+    likes?: number
+  }
+  extractedData: {
+    headline: string
+    benefits: string[]
+    price: number
+    guarantee?: string
+    urgency?: string
+    socialProof?: string
+  }
+  metrics?: {
+    successScore: number
+    potentialRevenue: number
+    competitionLevel: 'low' | 'medium' | 'high'
+    trendScore: number
+  }
+  metadata?: {
+    scrapedAt: string
+    dataQuality: 'high' | 'medium' | 'low'
+    confidence: number
+  }
+}
+
 export interface MetricasCampanha {
   id: string
   nome: string

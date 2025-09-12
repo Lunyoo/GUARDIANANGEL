@@ -1,0 +1,661 @@
+{
+  "campaigns": [
+    {
+      "campaignId": "C1",
+      "name": "Campanha 1",
+      "totalSpent": 0,
+      "totalLeads": 0,
+      "roas": 1.6,
+      "active": true,
+      "budget": 182.5100531136601,
+      "lastUpdated": 1756093882027
+    },
+    {
+      "campaignId": "C2",
+      "name": "Campanha 2",
+      "totalSpent": 0,
+      "totalLeads": 0,
+      "roas": 0.9,
+      "active": true,
+      "budget": 100.99488814462264,
+      "lastUpdated": 1756093882029
+    },
+    {
+      "campaignId": "C3",
+      "name": "Campanha 3",
+      "totalSpent": 0,
+      "totalLeads": 0,
+      "roas": 2.2,
+      "active": true,
+      "budget": 235.16977791393876,
+      "lastUpdated": 1756093882030
+    },
+    {
+      "campaignId": "CAMP_A",
+      "name": "A",
+      "totalSpent": 0,
+      "totalLeads": 0,
+      "roas": 1.2,
+      "active": true,
+      "budget": 137.9901849975254,
+      "lastUpdated": 1756403524294
+    },
+    {
+      "campaignId": "CAMP_B",
+      "name": "B",
+      "totalSpent": 0,
+      "totalLeads": 0,
+      "roas": 0.8,
+      "active": true,
+      "budget": 88.69043170005813,
+      "lastUpdated": 1756403524303
+    },
+    {
+      "campaignId": "CAMP_C",
+      "name": "C",
+      "totalSpent": 0,
+      "totalLeads": 0,
+      "roas": 1.5,
+      "active": true,
+      "budget": 161.90669057433286,
+      "lastUpdated": 1756403524307
+    },
+    {
+      "campaignId": "organic_whatsapp",
+      "name": "organic_whatsapp",
+      "totalSpent": 0,
+      "totalLeads": 146,
+      "roas": 0,
+      "active": true,
+      "budget": 0.011858984765444898,
+      "lastUpdated": 1756784998726
+    },
+    {
+      "campaignId": "120234143742540191",
+      "name": "CalcinhaLipo_Awareness_SP",
+      "totalSpent": 0,
+      "totalLeads": 0,
+      "roas": 0,
+      "active": true,
+      "budget": 0.011858984765444898,
+      "lastUpdated": 1756842380584
+    },
+    {
+      "campaignId": "whatsapp_bot",
+      "name": "whatsapp_bot",
+      "totalSpent": 96.5,
+      "totalLeads": 193,
+      "roas": 0,
+      "active": true,
+      "budget": 0,
+      "lastUpdated": 1757694244477
+    }
+  ],
+  "decisions": [
+    {
+      "id": "1756842641540",
+      "timestamp": 1756842641540,
+      "strategy": "growth",
+      "allocations": [
+        {
+          "campaignId": "C1",
+          "from": 150.5993316668473,
+          "to": 182.5100531136601,
+          "delta": 31.9107214468128,
+          "rationale": "scoreShare=0.201",
+          "recommendedBudget": 182.5100531136601,
+          "change": 31.9107214468128,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "C2",
+          "from": 77.01102187509235,
+          "to": 100.99488814462264,
+          "delta": 23.98386626953028,
+          "rationale": "scoreShare=0.111",
+          "recommendedBudget": 100.99488814462264,
+          "change": 23.98386626953028,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "C3",
+          "from": 207.074081041915,
+          "to": 235.16977791393876,
+          "delta": 28.09569687202375,
+          "rationale": "scoreShare=0.259",
+          "recommendedBudget": 235.16977791393876,
+          "change": 28.09569687202375,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "CAMP_A",
+          "from": 112.94949875013543,
+          "to": 137.9901849975254,
+          "delta": 25.04068624738997,
+          "rationale": "scoreShare=0.152",
+          "recommendedBudget": 137.9901849975254,
+          "change": 25.04068624738997,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "CAMP_B",
+          "from": 68.45424166674877,
+          "to": 88.69043170005813,
+          "delta": 20.236190033309356,
+          "rationale": "scoreShare=0.098",
+          "recommendedBudget": 88.69043170005813,
+          "change": 20.236190033309356,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "CAMP_C",
+          "from": 141.18687343766933,
+          "to": 161.90669057433286,
+          "delta": 20.719817136663522,
+          "rationale": "scoreShare=0.178",
+          "recommendedBudget": 161.90669057433286,
+          "change": 20.719817136663522,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "organic_whatsapp",
+          "from": 0.010695975260429494,
+          "to": 0.011858984765444898,
+          "delta": 0.001163009505015404,
+          "rationale": "scoreShare=0.000",
+          "recommendedBudget": 0.011858984765444898,
+          "change": 0.001163009505015404,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "120234143742540191",
+          "from": 150,
+          "to": 0.011858984765444898,
+          "delta": -149.98814101523456,
+          "rationale": "scoreShare=0.000",
+          "recommendedBudget": 0.011858984765444898,
+          "change": -149.98814101523456,
+          "reasoning": "rebalanced"
+        }
+      ],
+      "expectedTotalROI": 1379.6855989412581,
+      "diversificationScore": 0.7407985528683505,
+      "pendingApproval": true,
+      "approved": true
+    },
+    {
+      "id": "1756579225877",
+      "timestamp": 1756579225877,
+      "strategy": "aggressive",
+      "allocations": [
+        {
+          "campaignId": "C1",
+          "from": 134.42761429056128,
+          "to": 150.5993316668473,
+          "delta": 16.17171737628601,
+          "rationale": "scoreShare=0.199",
+          "recommendedBudget": 150.5993316668473,
+          "change": 16.17171737628601,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "C2",
+          "from": 68.74139367130972,
+          "to": 77.01102187509235,
+          "delta": 8.26962820378263,
+          "rationale": "scoreShare=0.102",
+          "recommendedBudget": 77.01102187509235,
+          "change": 8.26962820378263,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "C3",
+          "from": 266.1666762953113,
+          "to": 207.074081041915,
+          "delta": -59.09259525339627,
+          "rationale": "scoreShare=0.273",
+          "recommendedBudget": 207.074081041915,
+          "change": -59.09259525339627,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "CAMP_A",
+          "from": 100.82071071792095,
+          "to": 112.94949875013543,
+          "delta": 12.128788032214487,
+          "rationale": "scoreShare=0.149",
+          "recommendedBudget": 112.94949875013543,
+          "change": 12.128788032214487,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "CAMP_B",
+          "from": 61.103461041164216,
+          "to": 68.45424166674877,
+          "delta": 7.350780625584555,
+          "rationale": "scoreShare=0.090",
+          "recommendedBudget": 68.45424166674877,
+          "change": 7.350780625584555,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "CAMP_C",
+          "from": 126.02588839740119,
+          "to": 141.18687343766933,
+          "delta": 15.160985040268145,
+          "rationale": "scoreShare=0.186",
+          "recommendedBudget": 141.18687343766933,
+          "change": 15.160985040268145,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "organic_whatsapp",
+          "from": 0,
+          "to": 0.010695975260429494,
+          "delta": 0.010695975260429494,
+          "rationale": "scoreShare=0.000",
+          "recommendedBudget": 0.010695975260429494,
+          "change": 0.010695975260429494,
+          "reasoning": "rebalanced"
+        }
+      ],
+      "expectedTotalROI": 1167.9149306368174,
+      "diversificationScore": 0.7265575344981003,
+      "pendingApproval": false
+    },
+    {
+      "id": "1756403524364",
+      "timestamp": 1756403524364,
+      "strategy": "balanced",
+      "allocations": [
+        {
+          "campaignId": "C1",
+          "from": 127.985374559278,
+          "to": 134.42761429056128,
+          "delta": 6.44223973128328,
+          "rationale": "scoreShare=0.199",
+          "recommendedBudget": 134.42761429056128,
+          "change": 6.44223973128328,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "C2",
+          "from": 71.99177318959386,
+          "to": 68.74139367130972,
+          "delta": -3.2503795182841344,
+          "rationale": "scoreShare=0.102",
+          "recommendedBudget": 68.74139367130972,
+          "change": -3.2503795182841344,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "C3",
+          "from": 175.97989001900723,
+          "to": 184.83796964952174,
+          "delta": 8.85807963051451,
+          "rationale": "scoreShare=0.273",
+          "recommendedBudget": 184.83796964952174,
+          "change": 8.85807963051451,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "CAMP_A",
+          "from": 100,
+          "to": 100.82071071792095,
+          "delta": 0.8207107179209459,
+          "rationale": "scoreShare=0.149",
+          "recommendedBudget": 100.82071071792095,
+          "change": 0.8207107179209459,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "CAMP_B",
+          "from": 150,
+          "to": 61.103461041164216,
+          "delta": -88.89653895883578,
+          "rationale": "scoreShare=0.090",
+          "recommendedBudget": 61.103461041164216,
+          "change": -88.89653895883578,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "CAMP_C",
+          "from": 50,
+          "to": 126.02588839740119,
+          "delta": 76.02588839740119,
+          "rationale": "scoreShare=0.186",
+          "recommendedBudget": 126.02588839740119,
+          "change": 76.02588839740119,
+          "reasoning": "rebalanced"
+        }
+      ],
+      "expectedTotalROI": 1042.501424688563,
+      "diversificationScore": 0.7265536723163841,
+      "pendingApproval": true,
+      "approved": true
+    },
+    {
+      "id": "1756293673430",
+      "timestamp": 1756293673430,
+      "strategy": "balanced",
+      "allocations": [
+        {
+          "campaignId": "C1",
+          "from": 127.98537455927801,
+          "to": 127.985374559278,
+          "delta": -1.4210854715202004e-14,
+          "rationale": "scoreShare=0.195",
+          "recommendedBudget": 127.985374559278,
+          "change": -1.4210854715202004e-14,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "C2",
+          "from": 71.99177318959387,
+          "to": 71.99177318959386,
+          "delta": -1.4210854715202004e-14,
+          "rationale": "scoreShare=0.110",
+          "recommendedBudget": 71.99177318959386,
+          "change": -1.4210854715202004e-14,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "C3",
+          "from": 175.97989001900726,
+          "to": 175.97989001900723,
+          "delta": -2.842170943040401e-14,
+          "rationale": "scoreShare=0.268",
+          "recommendedBudget": 175.97989001900723,
+          "change": -2.842170943040401e-14,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "CAMP_A",
+          "from": 95.98903091945849,
+          "to": 95.98903091945847,
+          "delta": -1.4210854715202004e-14,
+          "rationale": "scoreShare=0.146",
+          "recommendedBudget": 95.98903091945847,
+          "change": -1.4210854715202004e-14,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "CAMP_B",
+          "from": 63.99268727963901,
+          "to": 63.992687279639,
+          "delta": -7.105427357601002e-15,
+          "rationale": "scoreShare=0.098",
+          "recommendedBudget": 63.992687279639,
+          "change": -7.105427357601002e-15,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "CAMP_C",
+          "from": 119.98628864932314,
+          "to": 119.98628864932311,
+          "delta": -2.842170943040401e-14,
+          "rationale": "scoreShare=0.183",
+          "recommendedBudget": 119.98628864932311,
+          "change": -2.842170943040401e-14,
+          "reasoning": "rebalanced"
+        }
+      ],
+      "expectedTotalROI": 1003.0853731083413,
+      "diversificationScore": 0.7317073170731707,
+      "pendingApproval": false
+    },
+    {
+      "id": "1756204735694",
+      "timestamp": 1756204735694,
+      "strategy": "balanced",
+      "allocations": [
+        {
+          "campaignId": "C1",
+          "from": 121.16597263533612,
+          "to": 127.98537455927801,
+          "delta": 6.819401923941896,
+          "rationale": "scoreShare=0.195",
+          "recommendedBudget": 127.98537455927801,
+          "change": 6.819401923941896,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "C2",
+          "from": 68.15585960737656,
+          "to": 71.99177318959387,
+          "delta": 3.835913582217316,
+          "rationale": "scoreShare=0.110",
+          "recommendedBudget": 71.99177318959387,
+          "change": 3.835913582217316,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "C3",
+          "from": 166.60321237358713,
+          "to": 175.97989001900726,
+          "delta": 9.37667764542013,
+          "rationale": "scoreShare=0.268",
+          "recommendedBudget": 175.97989001900726,
+          "change": 9.37667764542013,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "CAMP_A",
+          "from": 100,
+          "to": 95.98903091945849,
+          "delta": -4.010969080541514,
+          "rationale": "scoreShare=0.146",
+          "recommendedBudget": 95.98903091945849,
+          "change": -4.010969080541514,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "CAMP_B",
+          "from": 150,
+          "to": 63.99268727963901,
+          "delta": -86.007312720361,
+          "rationale": "scoreShare=0.098",
+          "recommendedBudget": 63.99268727963901,
+          "change": -86.007312720361,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "CAMP_C",
+          "from": 50,
+          "to": 119.98628864932314,
+          "delta": 69.98628864932314,
+          "rationale": "scoreShare=0.183",
+          "recommendedBudget": 119.98628864932314,
+          "change": 69.98628864932314,
+          "reasoning": "rebalanced"
+        }
+      ],
+      "expectedTotalROI": 1003.0853731083414,
+      "diversificationScore": 0.7317073170731707,
+      "pendingApproval": true,
+      "approved": true
+    },
+    {
+      "id": "1756177736852",
+      "timestamp": 1756177736852,
+      "strategy": "balanced",
+      "allocations": [
+        {
+          "campaignId": "C1",
+          "from": 109.26829268292683,
+          "to": 121.16597263533612,
+          "delta": 11.897679952409291,
+          "rationale": "scoreShare=0.195",
+          "recommendedBudget": 121.16597263533612,
+          "change": 11.897679952409291,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "C2",
+          "from": 61.46341463414633,
+          "to": 68.15585960737656,
+          "delta": 6.692444973230224,
+          "rationale": "scoreShare=0.110",
+          "recommendedBudget": 68.15585960737656,
+          "change": 6.692444973230224,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "C3",
+          "from": 150.24390243902437,
+          "to": 166.60321237358713,
+          "delta": 16.35930993456276,
+          "rationale": "scoreShare=0.268",
+          "recommendedBudget": 166.60321237358713,
+          "change": 16.35930993456276,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "CAMP_A",
+          "from": 100,
+          "to": 90.87447947650206,
+          "delta": -9.12552052349794,
+          "rationale": "scoreShare=0.146",
+          "recommendedBudget": 90.87447947650206,
+          "change": -9.12552052349794,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "CAMP_B",
+          "from": 150,
+          "to": 60.58298631766806,
+          "delta": -89.41701368233194,
+          "rationale": "scoreShare=0.098",
+          "recommendedBudget": 60.58298631766806,
+          "change": -89.41701368233194,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "CAMP_C",
+          "from": 50,
+          "to": 113.5930993456276,
+          "delta": 63.59309934562761,
+          "rationale": "scoreShare=0.183",
+          "recommendedBudget": 113.5930993456276,
+          "change": 63.59309934562761,
+          "reasoning": "rebalanced"
+        }
+      ],
+      "expectedTotalROI": 949.6383105294468,
+      "diversificationScore": 0.7317073170731707,
+      "pendingApproval": true,
+      "approved": true
+    },
+    {
+      "id": "1756177489562",
+      "timestamp": 1756177489562,
+      "strategy": "balanced",
+      "allocations": [
+        {
+          "campaignId": "C1",
+          "from": 88.51063829787233,
+          "to": 109.26829268292683,
+          "delta": 20.757654385054494,
+          "rationale": "scoreShare=0.195",
+          "recommendedBudget": 109.26829268292683,
+          "change": 20.757654385054494,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "C2",
+          "from": 49.787234042553195,
+          "to": 61.46341463414633,
+          "delta": 11.676180591593138,
+          "rationale": "scoreShare=0.110",
+          "recommendedBudget": 61.46341463414633,
+          "change": 11.676180591593138,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "C3",
+          "from": 121.70212765957446,
+          "to": 150.24390243902437,
+          "delta": 28.54177477944991,
+          "rationale": "scoreShare=0.268",
+          "recommendedBudget": 150.24390243902437,
+          "change": 28.54177477944991,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "CAMP_A",
+          "from": 100,
+          "to": 81.9512195121951,
+          "delta": -18.048780487804905,
+          "rationale": "scoreShare=0.146",
+          "recommendedBudget": 81.9512195121951,
+          "change": -18.048780487804905,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "CAMP_B",
+          "from": 150,
+          "to": 54.63414634146341,
+          "delta": -95.3658536585366,
+          "rationale": "scoreShare=0.098",
+          "recommendedBudget": 54.63414634146341,
+          "change": -95.3658536585366,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "CAMP_C",
+          "from": 50,
+          "to": 102.4390243902439,
+          "delta": 52.4390243902439,
+          "rationale": "scoreShare=0.183",
+          "recommendedBudget": 102.4390243902439,
+          "change": 52.4390243902439,
+          "reasoning": "rebalanced"
+        }
+      ],
+      "expectedTotalROI": 856.3902439024389,
+      "diversificationScore": 0.7317073170731707,
+      "pendingApproval": true,
+      "approved": true
+    },
+    {
+      "id": "1756093915088",
+      "timestamp": 1756093915088,
+      "strategy": "balanced",
+      "allocations": [
+        {
+          "campaignId": "C1",
+          "from": 120,
+          "to": 88.51063829787233,
+          "delta": -31.489361702127667,
+          "rationale": "scoreShare=0.340",
+          "recommendedBudget": 88.51063829787233,
+          "change": -31.489361702127667,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "C2",
+          "from": 80,
+          "to": 49.787234042553195,
+          "delta": -30.212765957446805,
+          "rationale": "scoreShare=0.191",
+          "recommendedBudget": 49.787234042553195,
+          "change": -30.212765957446805,
+          "reasoning": "rebalanced"
+        },
+        {
+          "campaignId": "C3",
+          "from": 60,
+          "to": 121.70212765957446,
+          "delta": 61.70212765957446,
+          "rationale": "scoreShare=0.468",
+          "recommendedBudget": 121.70212765957446,
+          "change": 61.70212765957446,
+          "reasoning": "rebalanced"
+        }
+      ],
+      "expectedTotalROI": 454.17021276595744,
+      "diversificationScore": 0.5319148936170213,
+      "pendingApproval": false
+    }
+  ]
+}

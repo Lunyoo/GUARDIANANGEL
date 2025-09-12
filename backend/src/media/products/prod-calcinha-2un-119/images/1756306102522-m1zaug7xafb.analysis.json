@@ -1,0 +1,23 @@
+{
+  "category": "testimonial",
+  "subcategory": "feedback de cliente",
+  "colors": [
+    "nude"
+  ],
+  "features": [
+    "conforto",
+    "modelagem"
+  ],
+  "context": "uso diário",
+  "confidence": 0.95,
+  "tags": [
+    "feedback",
+    "cliente",
+    "confortável"
+  ],
+  "description": "Imagem de feedback de cliente sobre a calcinha modeladora, destacando conforto e modelagem.",
+  "recommendedFor": [
+    "uso diário",
+    "eventos especiais"
+  ]
+}

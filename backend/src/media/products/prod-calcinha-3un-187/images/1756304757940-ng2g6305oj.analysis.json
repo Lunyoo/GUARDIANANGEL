@@ -1,0 +1,15 @@
+{
+  "category": "other",
+  "subcategory": "unknown",
+  "colors": [
+    "unknown"
+  ],
+  "features": [
+    "auto_detected"
+  ],
+  "context": "Análise automática baseada em nome do arquivo",
+  "confidence": 0.3,
+  "tags": [],
+  "description": "Imagem categorizada automaticamente como other",
+  "recommendedFor": []
+}

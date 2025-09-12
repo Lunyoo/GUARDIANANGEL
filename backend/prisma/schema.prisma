@@ -6,8 +6,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./neural_system.db"
 }
 
 model User {
@@ -219,4 +219,191 @@ model SystemConfig {
   updatedAt       DateTime @updatedAt
   
   @@map("system_config")
+}
+
+// WhatsApp/Conversas Models
+model Lead {
+  id            String   @id @default(uuid())
+  phone         String   @unique
+  name          String?
+  fullName      String?  @map("full_name")
+  firstContact  DateTime? @map("first_contact")
+  lastContact   DateTime? @map("last_contact")
+  city          String?
+  address       String?
+  neighborhood  String?
+  zipCode       String?  @map("zip_code")
+  selectedSize  String?  @map("selected_size")
+  selectedColor String?  @map("selected_color")
+  status        String   @default("NEW") // NEW, CONFIRMED, DELIVERED, CANCELLED
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @default(now()) @updatedAt @map("updated_at")
+  
+  conversations Conversation[]
+  messages      Message[]
+  
+  @@map("leads")
+}
+
+model Conversation {
+  id              String   @id @default(uuid())
+  leadId          String   @map("lead_id")
+  stage           String   @default("initial")
+  status          String   @default("active")
+  isEscalated     Boolean  @default(false) @map("is_escalated")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @default(now()) @map("updated_at")
+  
+  lead            Lead     @relation(fields: [leadId], references: [id])
+  messages        Message[]
+  
+  @@map("conversations")
+}
+
+model Message {
+  id               String   @id @default(uuid())
+  leadId           String   @map("lead_id")
+  conversationId   String?  @map("conversation_id")
+  direction        String   // inbound, outbound
+  type             String   @default("text")
+  content          String?
+  createdAt        DateTime @default(now()) @map("created_at")
+  
+  lead             Lead     @relation(fields: [leadId], references: [id])
+  conversation     Conversation? @relation(fields: [conversationId], references: [id])
+  
+  @@map("messages")
+}
+
+model Product {
+  id            String   @id @default(uuid())
+  name          String
+  description   String
+  price         Float
+  originalPrice Float?
+  images        String?  // JSON string ou comma-separated
+  sku           String?
+  slug          String?
+  codCities     String?  // JSON string com array de cidades COD
+  clientPrompt  String?  // Template com placeholders: {VENDEDOR}, {PRODUTO}, {PRECO}, {ESTRATEGIA}, {CIDADE}, {ENTREGA_INFO}, {TOM}
+  inStock       Boolean  @default(true)
+  category      String   @default("lingerie")
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@map("products")
+}
+
+model Approval {
+  id              String    @id @default(uuid())
+  type            String    // budget_increase, campaign_pause, etc
+  action          String    // Descrição da ação
+  details         String    // JSON com detalhes
+  impact          String    // Descrição do impacto
+  status          String    @default("pending") // pending, approved, rejected, expired
+  createdBy       String    @default("auto-optimizer")
+  approvedBy      String?
+  rejectedBy      String?
+  rejectionReason String?
+  createdAt       DateTime  @default(now())
+  approvedAt      DateTime?
+  rejectedAt      DateTime?
+  
+  @@map("approvals")
+}
+
+model HypeeOrder {
+  id              String    @id @default(uuid())
+  orderNumber     String?   @unique // Número do pedido para cliente
+  
+  // Customer info
+  customerName    String
+  customerPhone   String
+  customerEmail   String?
+  customerAddress String?
+  city            String
+  
+  // Product info
+  productId       String?
+  productName     String
+  quantity        Int       @default(1)
+  unitPrice       Float
+  totalAmount     Float
+  
+  // Payment & delivery
+  paymentMethod   String    // COD, PIX, CARD
+  status          String    @default("PENDING") // PENDING, CONFIRMED, SHIPPED, DELIVERED, CANCELLED
+  
+  // Timestamps
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  confirmedAt     DateTime?
+  shippedAt       DateTime?
+  deliveredAt     DateTime?
+  cancelledAt     DateTime?
+  scheduledAt     DateTime? // Para COD agendado
+  
+  // Additional data
+  notes           String?
+  trackingCode    String?
+  adminNotified   Boolean   @default(false)
+  
+  @@map("hypee_orders")
+}
+
+model ConversationPrompt {
+  id              String    @id @default(uuid())
+  productId       String    @unique
+  prompt          String
+  lastUpdated     DateTime  @default(now())
+  isActive        Boolean   @default(true)
+  
+  @@map("conversation_prompts")
+}
+
+model ConversationContext {
+  id              String    @id @default(uuid())
+  conversationId  String    @unique
+  productId       String?
+  currentStage    String?
+  customerData    String?   // JSON with customer preferences
+  priceOffered    Float?
+  cityOffered     String?
+  lastUpdated     DateTime  @default(now())
+  
+  @@map("conversation_contexts")
+}
+
+// 🔗 Campaign Links Persistence
+model CampaignLink {
+  id              String   @id // we use the generated identifier as primary key
+  videoTitle      String
+  videoDescription String?
+  videoType       String   // depoimento | demonstracao | modelo | custom
+  customContext   String?
+  identifier      String   @unique
+  generatedLink   String
+  linkedProductId String?
+  productName     String?
+  clicks          Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  lastAccessBy    String?
+  trackingData    Json?
+
+  clicksRel       CampaignLinkClick[]
+
+  @@map("campaign_links")
+}
+
+model CampaignLinkClick {
+  id        String   @id @default(uuid())
+  linkId    String
+  link      CampaignLink @relation(fields: [linkId], references: [id])
+  timestamp DateTime @default(now())
+  userAgent String?
+  ip        String?
+
+  @@map("campaign_link_clicks")
 }

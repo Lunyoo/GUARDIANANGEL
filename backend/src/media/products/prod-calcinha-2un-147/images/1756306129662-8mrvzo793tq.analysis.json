@@ -1,0 +1,23 @@
+{
+  "category": "other",
+  "subcategory": "tabela de medidas",
+  "colors": [
+    "neutro"
+  ],
+  "features": [
+    "tabela de tamanhos",
+    "desconto"
+  ],
+  "context": "informação de tamanho e promoção",
+  "confidence": 0.95,
+  "tags": [
+    "tamanho",
+    "desconto",
+    "medidas"
+  ],
+  "description": "Imagem com tabela de medidas e desconto de 50% para calcinha modeladora.",
+  "recommendedFor": [
+    "escolha de tamanho",
+    "promoção"
+  ]
+}

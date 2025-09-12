@@ -5,6 +5,59 @@ import { processSingleSalesEvent } from './attributionForwarder.js'
 
 let queue: Queue | null = null
 let workerStarted = false
+let workerRef: Worker | null = null
+
+async function isWritableMaster(conn: IORedis): Promise<boolean> {
+  try {
+    // Prefer ROLE command (works on standalone and cluster nodes)
+    const roleRes = await (conn as any).role().catch(() => null)
+    if (Array.isArray(roleRes)) {
+      const role = String(roleRes[0] || '').toLowerCase()
+      return role === 'master'
+    }
+  } catch {}
+  try {
+    const info = await conn.info('replication')
+    if (typeof info === 'string') {
+      const m = /role:(\w+)/i.exec(info)
+      if (m) return m[1].toLowerCase() === 'master'
+    }
+  } catch {}
+  // If we can't determine, assume not writable to be safe
+  return false
+}
+
+function isReplicaError(err: any): boolean {
+  const msg = (err?.message || String(err || '')).toLowerCase()
+  return (
+    msg.includes('readonly') ||
+    msg.includes('read only') ||
+    msg.includes('master -> replica') ||
+    msg.includes('replica') ||
+    msg.includes('slave') ||
+    msg.includes('unblocked') // "UNBLOCKED force unblock from blocking operation, instance state changed"
+  )
+}
+
+async function shutdownQueue(reason: string) {
+  try {
+    if (workerRef) {
+      await workerRef.close()
+      workerRef = null
+    }
+  } catch {}
+  try {
+    if (queue) {
+      // @ts-ignore
+      const qConn: IORedis | undefined = (queue as any)?.opts?.connection
+      await queue.close().catch(() => {})
+      queue = null
+      if (qConn) await qConn.quit().catch(() => {})
+    }
+  } catch {}
+  workerStarted = false
+  logger.warn(`CAPI Queue disabled: ${reason}`)
+}
 
 export function isQueueEnabled() {
   return !!queue
@@ -17,6 +70,14 @@ export async function initCapiQueue() {
     const connection = new IORedis(redisUrl, { maxRetriesPerRequest: null })
     // basic ping to validate
     await connection.ping()
+    // Ensure we're on a writable master; if not, disable queue to avoid READONLY errors
+    const writable = await isWritableMaster(connection)
+    if (!writable) {
+      logger.warn('Redis is in replica/read-only mode. Disabling BullMQ CAPI queue to avoid errors.')
+      await connection.quit().catch(() => {})
+      queue = null
+      return null
+    }
     queue = new Queue('capi-events', { connection })
     logger.info('CAPI Queue initialized (BullMQ)')
     return queue
@@ -32,6 +93,17 @@ export async function startCapiWorkers() {
   const q = await initCapiQueue()
   if (!q) return
   const connection = (q as any).opts?.connection as IORedis
+  // Guard against replica state changes at runtime
+  connection.on('error', async (err: any) => {
+    if (isReplicaError(err)) {
+      await shutdownQueue('Redis switched to replica/read-only mode')
+    }
+  })
+  connection.on('end', async () => {
+    // Connection dropped; worker will error soon. Let bullmq handle reconnect,
+    // but if it reconnects to a replica we'll catch it via error above.
+  })
+
   const worker = new Worker(
     'capi-events',
     async (job: Job) => {
@@ -50,8 +122,18 @@ export async function startCapiWorkers() {
   })
   worker.on('failed', (job: Job | undefined, err: Error) => {
     logger.error(`CAPI job failed id=${job?.id}: ${err?.message}`)
+    if (isReplicaError(err)) {
+      // Stop workers to prevent log spam in replica mode
+      shutdownQueue('Worker encountered replica/READONLY error').catch(() => {})
+    }
+  })
+  worker.on('error', (err: Error) => {
+    if (isReplicaError(err)) {
+      shutdownQueue('BullMQ worker error (replica/READONLY)').catch(() => {})
+    }
   })
   workerStarted = true
+  workerRef = worker
   logger.info('CAPI Worker started (BullMQ)')
 }
 

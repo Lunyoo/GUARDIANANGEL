@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -8,7 +8,6 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { toast } from 'sonner'
-import OfferInsightsAnalysis from './OfferInsightsAnalysis'
 import { 
   Eye,
   TrendingUp,
@@ -72,213 +71,14 @@ interface AdVariation {
   score: number
 }
 
-// Dados mockados para demonstração
-const mockVariations: AdVariation[] = [
-  {
-    id: 'var-001',
-    title: 'Protocolo Detox Revolution - Variação Principal',
-    platform: 'Facebook',
-    advertiser: 'Dra. Sarah Wellness',
-    creative: {
-      type: 'image',
-      url: '/api/placeholder/400/300',
-      thumbnailUrl: '/api/placeholder/300/200'
-    },
-    copy: {
-      headline: '🔥 MÉDICA REVELA: Protocolo Secreto Para Perder 15kg',
-      primaryText: 'ATENÇÃO: Método revolucionário faz mulheres de 40+ perderem até 15kg em 30 dias! Sem dietas malucas, sem exercícios pesados. COMPROVADO por mais de 3.000 mulheres!',
-      description: 'Protocolo desenvolvido por médica especialista em emagrecimento',
-      callToAction: 'QUERO EMAGRECER AGORA'
-    },
-    metrics: {
-      impressions: 125000,
-      clicks: 4250,
-      ctr: 3.4,
-      cpm: 8.90,
-      spend: 1112.50,
-      conversions: 89,
-      costPerConversion: 12.50,
-      roas: 15.8,
-      frequency: 1.8,
-      reach: 69444
-    },
-    status: 'active',
-    startDate: new Date('2024-01-15'),
-    score: 94
-  },
-  {
-    id: 'var-002',
-    title: 'Protocolo Detox Revolution - Depoimento Médica',
-    platform: 'Facebook',
-    advertiser: 'Dra. Sarah Wellness',
-    creative: {
-      type: 'video',
-      url: '/api/placeholder/400/300',
-      thumbnailUrl: '/api/placeholder/300/200',
-      duration: 45
-    },
-    copy: {
-      headline: 'Médica de 45 anos perdeu 18kg com este método',
-      primaryText: 'Dra. Sarah compartilha o protocolo que usou para perder 18kg e está ajudando milhares de mulheres. VEJA o vídeo completo!',
-      description: 'Depoimento real da médica criadora do método',
-      callToAction: 'ASSISTIR VÍDEO COMPLETO'
-    },
-    metrics: {
-      impressions: 98000,
-      clicks: 2940,
-      ctr: 3.0,
-      cpm: 11.20,
-      spend: 1097.60,
-      conversions: 67,
-      costPerConversion: 16.40,
-      roas: 12.1,
-      frequency: 2.1,
-      reach: 46667
-    },
-    status: 'active',
-    startDate: new Date('2024-01-10'),
-    score: 87
-  },
-  {
-    id: 'var-003',
-    title: 'Protocolo Detox Revolution - Antes e Depois',
-    platform: 'Facebook',
-    advertiser: 'Dra. Sarah Wellness',
-    creative: {
-      type: 'carousel',
-      url: '/api/placeholder/400/300',
-      thumbnailUrl: '/api/placeholder/300/200'
-    },
-    copy: {
-      headline: 'Antes e Depois: Transformações REAIS',
-      primaryText: 'VEJA as transformações IMPRESSIONANTES de mulheres que seguiram nosso protocolo. Resultados em apenas 30 dias!',
-      description: 'Cases reais de sucesso do protocolo',
-      callToAction: 'VER TODAS AS TRANSFORMAÇÕES'
-    },
-    metrics: {
-      impressions: 156000,
-      clicks: 3432,
-      ctr: 2.2,
-      cpm: 15.60,
-      spend: 2433.60,
-      conversions: 54,
-      costPerConversion: 45.10,
-      roas: 4.4,
-      frequency: 2.8,
-      reach: 55714
-    },
-    status: 'paused',
-    startDate: new Date('2024-01-08'),
-    score: 72
-  },
-  {
-    id: 'var-004',
-    title: 'Protocolo Detox Revolution - Urgência',
-    platform: 'Instagram',
-    advertiser: 'Dra. Sarah Wellness',
-    creative: {
-      type: 'image',
-      url: '/api/placeholder/400/300',
-      thumbnailUrl: '/api/placeholder/300/200'
-    },
-    copy: {
-      headline: 'URGENTE: Apenas 100 vagas restantes',
-      primaryText: '⚠️ ÚLTIMA CHANCE: Restam apenas 100 vagas para o protocolo que está transformando a vida de milhares de mulheres. NÃO PERCA!',
-      description: 'Oferta por tempo limitado - vagas limitadas',
-      callToAction: 'GARANTIR MINHA VAGA'
-    },
-    metrics: {
-      impressions: 87000,
-      clicks: 1740,
-      ctr: 2.0,
-      cpm: 18.90,
-      spend: 1644.30,
-      conversions: 23,
-      costPerConversion: 71.49,
-      roas: 2.8,
-      frequency: 3.2,
-      reach: 27188
-    },
-    status: 'ended',
-    startDate: new Date('2024-01-05'),
-    score: 58
-  },
-  {
-    id: 'var-005',
-    title: 'Protocolo Detox Revolution - Científico',
-    platform: 'Facebook',
-    advertiser: 'Dra. Sarah Wellness',
-    creative: {
-      type: 'video',
-      url: '/api/placeholder/400/300',
-      thumbnailUrl: '/api/placeholder/300/200',
-      duration: 30
-    },
-    copy: {
-      headline: 'Protocolo Aprovado por 95% das Usuárias',
-      primaryText: 'PESQUISA COMPROVA: 95% das mulheres que seguiram nosso protocolo perderam mais de 10kg em 30 dias. Baseado em ciência!',
-      description: 'Dados científicos comprovam eficácia',
-      callToAction: 'VER PESQUISA COMPLETA'
-    },
-    metrics: {
-      impressions: 134000,
-      clicks: 2680,
-      ctr: 2.0,
-      cpm: 22.40,
-      spend: 3001.60,
-      conversions: 35,
-      costPerConversion: 85.76,
-      roas: 2.3,
-      frequency: 2.5,
-      reach: 53600
-    },
-    status: 'paused',
-    startDate: new Date('2024-01-12'),
-    score: 61
-  },
-  {
-    id: 'var-006',
-    title: 'Protocolo Detox Revolution - Prova Social',
-    platform: 'TikTok',
-    advertiser: 'Dra. Sarah Wellness',
-    creative: {
-      type: 'video',
-      url: '/api/placeholder/400/300',
-      thumbnailUrl: '/api/placeholder/300/200',
-      duration: 60
-    },
-    copy: {
-      headline: 'Mais de 5.000 mulheres já transformaram seus corpos',
-      primaryText: 'INCRÍVEL! Protocolo médico já ajudou mais de 5.000 mulheres a perderem peso de forma saudável. Próxima pode ser você!',
-      description: 'Depoimentos reais de mulheres transformadas',
-      callToAction: 'COMEÇAR MINHA TRANSFORMAÇÃO'
-    },
-    metrics: {
-      impressions: 210000,
-      clicks: 8400,
-      ctr: 4.0,
-      cpm: 6.80,
-      spend: 1428.00,
-      conversions: 126,
-      costPerConversion: 11.33,
-      roas: 17.5,
-      frequency: 1.5,
-      reach: 140000
-    },
-    status: 'active',
-    startDate: new Date('2024-01-20'),
-    score: 96
-  }
-]
-
 interface MultipleAdsViewProps {
-  variations?: AdVariation[]
+  variations: AdVariation[]
   offerTitle?: string
 }
 
 export default function MultipleAdsView({ 
-  variations = mockVariations, 
-  offerTitle = 'Protocolo Detox Revolution - Perca 15kg em 30 Dias' 
+  variations, 
+  offerTitle = '—' 
 }: MultipleAdsViewProps) {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [sortBy, setSortBy] = useState<'score' | 'roas' | 'ctr' | 'conversions'>('score')
@@ -287,8 +87,8 @@ export default function MultipleAdsView({
   const [comparisonMode, setComparisonMode] = useState(false)
   const [selectedForComparison, setSelectedForComparison] = useState<string[]>([])
 
-  // Filtrar e ordenar variações
-  const filteredAndSortedVariations = variations
+  // Filtrar e ordenar variações (defensivo para dados vazios)
+  const filteredAndSortedVariations = useMemo(()=> (variations || [])
     .filter(variation => filterBy === 'all' || variation.status === filterBy)
     .sort((a, b) => {
       switch (sortBy) {
@@ -298,7 +98,7 @@ export default function MultipleAdsView({
         case 'conversions': return b.metrics.conversions - a.metrics.conversions
         default: return 0
       }
-    })
+    }), [variations, filterBy, sortBy])
 
   const toggleComparison = (adId: string) => {
     if (selectedForComparison.includes(adId)) {
@@ -388,16 +188,12 @@ export default function MultipleAdsView({
         </div>
       </div>
 
-      {/* Tabs para diferentes visualizações */}
+      {/* Visualização de anúncios */}
       <Tabs defaultValue="ads" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2 bg-card/50">
+        <TabsList className="grid w-full grid-cols-1 bg-card/50">
           <TabsTrigger value="ads" className="flex items-center gap-2">
             <Target className="h-4 w-4" />
             Anúncios
-          </TabsTrigger>
-          <TabsTrigger value="insights" className="flex items-center gap-2">
-            <Brain className="h-4 w-4" />
-            Insights da IA
           </TabsTrigger>
         </TabsList>
 
@@ -451,7 +247,7 @@ export default function MultipleAdsView({
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-muted-foreground">Total de Anúncios</p>
-                    <p className="text-2xl font-bold">{variations.length}</p>
+                    <p className="text-2xl font-bold">{(variations || []).length}</p>
                   </div>
                   <Target className="h-8 w-8 text-primary" />
                 </div>
@@ -464,7 +260,7 @@ export default function MultipleAdsView({
                   <div>
                     <p className="text-sm text-muted-foreground">Melhor ROAS</p>
                     <p className="text-2xl font-bold text-success">
-                      {Math.max(...variations.map(v => v.metrics.roas)).toFixed(1)}x
+                      {((variations||[]).length ? Math.max(...(variations||[]).map(v => v.metrics.roas)).toFixed(1) : '0.0')}x
                     </p>
                   </div>
                   <TrendingUp className="h-8 w-8 text-success" />
@@ -478,7 +274,7 @@ export default function MultipleAdsView({
                   <div>
                     <p className="text-sm text-muted-foreground">Melhor CTR</p>
                     <p className="text-2xl font-bold text-accent">
-                      {Math.max(...variations.map(v => v.metrics.ctr))}%
+                      {((variations||[]).length ? Math.max(...(variations||[]).map(v => v.metrics.ctr)) : 0)}%
                     </p>
                   </div>
                   <MousePointer className="h-8 w-8 text-accent" />
@@ -492,7 +288,7 @@ export default function MultipleAdsView({
                   <div>
                     <p className="text-sm text-muted-foreground">Total Investido</p>
                     <p className="text-2xl font-bold">
-                      R$ {variations.reduce((acc, v) => acc + v.metrics.spend, 0).toFixed(0)}
+                      R$ {(variations||[]).reduce((acc, v) => acc + v.metrics.spend, 0).toFixed(0)}
                     </p>
                   </div>
                   <DollarSign className="h-8 w-8 text-warning" />
@@ -715,19 +511,15 @@ export default function MultipleAdsView({
         </div>
       )}
 
-        </TabsContent>
-
-        <TabsContent value="insights">
-          <OfferInsightsAnalysis variations={variations} offerTitle={offerTitle} />
-        </TabsContent>
+  </TabsContent>
       </Tabs>
 
       {/* Modal de Detalhes do Anúncio */}
-      {selectedAd && (
+  {selectedAd && (
         <Dialog open={!!selectedAd} onOpenChange={() => setSelectedAd(null)}>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             {(() => {
-              const ad = variations.find(v => v.id === selectedAd)
+      const ad = (variations||[]).find(v => v.id === selectedAd)
               if (!ad) return null
               
               return (
@@ -890,7 +682,7 @@ export default function MultipleAdsView({
                           </div>
                           <div className="text-center">
                             <div className="text-lg font-semibold">
-                              {ad.startDate.toLocaleDateString('pt-BR')}
+                              {new Date(ad.startDate as any).toLocaleDateString('pt-BR')}
                             </div>
                             <div className="text-sm text-muted-foreground">Início</div>
                           </div>

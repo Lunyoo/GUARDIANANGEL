@@ -1,0 +1,1501 @@
+{
+  "items": [
+    {
+      "leadId": "7e4e0f4f-4def-4306-a986-bd4d6f6e5fc1",
+      "segment": "A-alto",
+      "score": 87.11,
+      "priority": 104.97823385441978,
+      "enqueuedAt": 1756158148387,
+      "status": "waiting"
+    },
+    {
+      "leadId": "1b7047a3-fd4b-4344-a472-ba8b1d44d997",
+      "segment": "A-alto",
+      "score": 87.28,
+      "priority": 104.9645355418437,
+      "enqueuedAt": 1756257890426,
+      "status": "waiting"
+    },
+    {
+      "leadId": "lead_5521982167556",
+      "segment": "A-alto",
+      "score": 86.69,
+      "priority": 104.95274985874761,
+      "enqueuedAt": 1757317160390,
+      "status": "waiting"
+    },
+    {
+      "leadId": "259853fa-0483-473a-94de-79a20b9bbe98",
+      "segment": "A-alto",
+      "score": 89.05,
+      "priority": 104.94065559940941,
+      "enqueuedAt": 1757646034550,
+      "status": "waiting"
+    },
+    {
+      "leadId": "fded6ddf-764a-4b66-ad80-9161dac793ba",
+      "segment": "A-alto",
+      "score": 85.64,
+      "priority": 104.8883251683869,
+      "enqueuedAt": 1757678087798,
+      "status": "waiting"
+    },
+    {
+      "leadId": "6e343f27-bb6c-4fab-8c3f-96f26b94d595",
+      "segment": "A-alto",
+      "score": 85.48,
+      "priority": 104.83644480212898,
+      "enqueuedAt": 1757595113305,
+      "status": "waiting"
+    },
+    {
+      "leadId": "034d784c-a9ea-4b55-a2d6-c8ded254cc82",
+      "segment": "A-alto",
+      "score": 86.91,
+      "priority": 104.79585370966214,
+      "enqueuedAt": 1757610359582,
+      "status": "waiting"
+    },
+    {
+      "leadId": "3edbb84a-8042-473c-bce2-2efb755eef07",
+      "segment": "A-alto",
+      "score": 87.63,
+      "priority": 104.78885795702564,
+      "enqueuedAt": 1756157229271,
+      "status": "waiting"
+    },
+    {
+      "leadId": "2c912094-84c4-4aea-b987-7e80d6c89d72",
+      "segment": "A-alto",
+      "score": 88.09,
+      "priority": 104.77612511813712,
+      "enqueuedAt": 1757649971020,
+      "status": "waiting"
+    },
+    {
+      "leadId": "556c7321-418e-4979-8a06-4186516f71b1",
+      "segment": "A-alto",
+      "score": 85.62,
+      "priority": 104.6604937210342,
+      "enqueuedAt": 1757677145985,
+      "status": "waiting"
+    },
+    {
+      "leadId": "b6c414f3-b10a-47c3-aceb-125819260dca",
+      "segment": "A-alto",
+      "score": 88.1,
+      "priority": 104.65908993571911,
+      "enqueuedAt": 1757650712141,
+      "status": "waiting"
+    },
+    {
+      "leadId": "63cd51c2-f45a-4e96-ad85-e8169d290189",
+      "segment": "A-alto",
+      "score": 85.55,
+      "priority": 104.64522710477638,
+      "enqueuedAt": 1757597640030,
+      "status": "waiting"
+    },
+    {
+      "leadId": "b22c854d-9904-43b7-a49c-235925d873f7",
+      "segment": "A-alto",
+      "score": 84.12,
+      "priority": 104.59646104076921,
+      "enqueuedAt": 1756908552306,
+      "status": "waiting"
+    },
+    {
+      "leadId": "b9798976-5c2b-4cdd-9858-c8794772a0b4",
+      "segment": "A-alto",
+      "score": 87.07,
+      "priority": 104.58961494419027,
+      "enqueuedAt": 1756158148300,
+      "status": "waiting"
+    },
+    {
+      "leadId": "lead_5511987654321",
+      "segment": "A-alto",
+      "score": 87.04,
+      "priority": 104.54983271681193,
+      "enqueuedAt": 1756957917060,
+      "status": "waiting"
+    },
+    {
+      "leadId": "e2448fd8-6ed5-4d93-911b-0328e32861f0",
+      "segment": "A-alto",
+      "score": 88.6,
+      "priority": 104.5490386687884,
+      "enqueuedAt": 1757365695156,
+      "status": "waiting"
+    },
+    {
+      "leadId": "7ac6eea1-59a6-47e1-81a1-4691da762282",
+      "segment": "A-alto",
+      "score": 87.67,
+      "priority": 104.51125755422257,
+      "enqueuedAt": 1756157287219,
+      "status": "waiting"
+    },
+    {
+      "leadId": "b3b9a7c5-9f4d-4c43-8843-2faa6d441e68",
+      "segment": "A-alto",
+      "score": 88.66,
+      "priority": 104.50490043462749,
+      "enqueuedAt": 1757365648161,
+      "status": "waiting"
+    },
+    {
+      "leadId": "54df2b85-9b85-4feb-a0aa-4b64cc903de8",
+      "segment": "A-alto",
+      "score": 97.62,
+      "priority": 104.49919561751399,
+      "enqueuedAt": 1756158531312,
+      "status": "waiting"
+    },
+    {
+      "leadId": "f0c6b692-cd0b-483d-bb51-0c584ba160e2",
+      "segment": "A-alto",
+      "score": 88.26,
+      "priority": 104.48232273270035,
+      "enqueuedAt": 1757362754277,
+      "status": "waiting"
+    },
+    {
+      "leadId": "ca7d1935-fbf4-48f2-ba37-510dd02fdd9e",
+      "segment": "A-alto",
+      "score": 87.6,
+      "priority": 104.46615606222248,
+      "enqueuedAt": 1756177489648,
+      "status": "waiting"
+    },
+    {
+      "leadId": "da2fe202-aac8-45e8-9502-e66ac50bbd4c",
+      "segment": "A-alto",
+      "score": 86.49,
+      "priority": 104.46396138416604,
+      "enqueuedAt": 1757608274429,
+      "status": "waiting"
+    },
+    {
+      "leadId": "d8a98c7b-1467-496d-907a-2ac41e4de7c8",
+      "segment": "A-alto",
+      "score": 98.99,
+      "priority": 104.43783074683999,
+      "enqueuedAt": 1756158531113,
+      "status": "waiting"
+    },
+    {
+      "leadId": "lead_5511967026464",
+      "segment": "A-alto",
+      "score": 86.36,
+      "priority": 104.39043781350307,
+      "enqueuedAt": 1757321729434,
+      "status": "waiting"
+    },
+    {
+      "leadId": "22a1a5fa-a137-47a7-9c58-e035aeaa917e",
+      "segment": "A-alto",
+      "score": 88.63,
+      "priority": 104.35010453039817,
+      "enqueuedAt": 1756156398001,
+      "status": "waiting"
+    },
+    {
+      "leadId": "11f9a37e-24b7-4a68-abf9-dcd6bcb8926f",
+      "segment": "A-alto",
+      "score": 87.78,
+      "priority": 104.29220224277472,
+      "enqueuedAt": 1757617606728,
+      "status": "waiting"
+    },
+    {
+      "leadId": "lead_5521968043988",
+      "segment": "A-alto",
+      "score": 85.62,
+      "priority": 104.28162638422245,
+      "enqueuedAt": 1757332131309,
+      "status": "waiting"
+    },
+    {
+      "leadId": "047b9c2e-360b-4f84-ac2b-d873c9690719",
+      "segment": "A-alto",
+      "score": 85.55,
+      "priority": 104.25612784194384,
+      "enqueuedAt": 1757597410303,
+      "status": "waiting"
+    },
+    {
+      "leadId": "584331c2-01a2-410c-aca0-2bf62aae4729",
+      "segment": "A-alto",
+      "score": 83.73,
+      "priority": 104.16478549452225,
+      "enqueuedAt": 1756902198331,
+      "status": "waiting"
+    },
+    {
+      "leadId": "0a795e08-eec9-4b90-8cd4-abf9b94dce5c",
+      "segment": "A-alto",
+      "score": 88.94,
+      "priority": 104.12466364415958,
+      "enqueuedAt": 1756168998146,
+      "status": "waiting"
+    },
+    {
+      "leadId": "lead_5511999888777",
+      "segment": "A-alto",
+      "score": 87.67,
+      "priority": 104.10372543876066,
+      "enqueuedAt": 1757302090101,
+      "status": "waiting"
+    },
+    {
+      "leadId": "f78943e1-b030-4d59-b1a7-e7d374ce0c79",
+      "segment": "A-alto",
+      "score": 89.06,
+      "priority": 104.06678860548953,
+      "enqueuedAt": 1757646034604,
+      "status": "waiting"
+    },
+    {
+      "leadId": "lead_5541999888888",
+      "segment": "A-alto",
+      "score": 85.77,
+      "priority": 104.06361392456967,
+      "enqueuedAt": 1757327775700,
+      "status": "waiting"
+    },
+    {
+      "leadId": "0c44f3a6-8ce2-4698-a480-9f5b238ce6da",
+      "segment": "A-alto",
+      "score": 87.21,
+      "priority": 104.05222307337448,
+      "enqueuedAt": 1756158148550,
+      "status": "waiting"
+    },
+    {
+      "leadId": "4e6066c7-fbc3-43f0-987b-f29abfaf485e",
+      "segment": "A-alto",
+      "score": 88.27,
+      "priority": 104.02677457590426,
+      "enqueuedAt": 1757362633154,
+      "status": "waiting"
+    },
+    {
+      "leadId": "1e927151-0a4e-44b5-b596-4ef37bd9b161",
+      "segment": "A-alto",
+      "score": 97.4,
+      "priority": 104.00808154804697,
+      "enqueuedAt": 1756158531699,
+      "status": "waiting"
+    },
+    {
+      "leadId": "3252693f-b670-405b-9853-d5050e90df77",
+      "segment": "A-alto",
+      "score": 83.78,
+      "priority": 103.99530200588816,
+      "enqueuedAt": 1756899075201,
+      "status": "waiting"
+    },
+    {
+      "leadId": "4df7a522-be87-4469-929f-6a576141d30a",
+      "segment": "A-alto",
+      "score": 94.04,
+      "priority": 103.95462445116225,
+      "enqueuedAt": 1756158531950,
+      "status": "waiting"
+    },
+    {
+      "leadId": "7aa6f812-a2ba-47b1-9ab3-0a63bb5594fc",
+      "segment": "A-alto",
+      "score": 86.49,
+      "priority": 103.93614501290097,
+      "enqueuedAt": 1757609603070,
+      "status": "waiting"
+    },
+    {
+      "leadId": "06c9ea39-2b11-4707-91fa-b4b5b144be32",
+      "segment": "A-alto",
+      "score": 87.38,
+      "priority": 103.92842462695147,
+      "enqueuedAt": 1756156522000,
+      "status": "waiting"
+    },
+    {
+      "leadId": "3adcd3af-230e-4b82-8021-c3cfb63b37d1",
+      "segment": "A-alto",
+      "score": 86.1,
+      "priority": 103.92717714214633,
+      "enqueuedAt": 1757603646401,
+      "status": "waiting"
+    },
+    {
+      "leadId": "b87ede7d-db55-4cbb-9207-b05b5c14db21",
+      "segment": "A-alto",
+      "score": 86.1,
+      "priority": 103.9057088205141,
+      "enqueuedAt": 1757604325990,
+      "status": "waiting"
+    },
+    {
+      "leadId": "ccefa2ed-383a-42f8-8781-77261a0d9b92",
+      "segment": "A-alto",
+      "score": 86.41,
+      "priority": 103.8981722797243,
+      "enqueuedAt": 1756926552690,
+      "status": "waiting"
+    },
+    {
+      "leadId": "dd24b4f9-beea-4f97-9fa2-41726955b743",
+      "segment": "A-alto",
+      "score": 86.42,
+      "priority": 103.89299994156711,
+      "enqueuedAt": 1756926002999,
+      "status": "waiting"
+    },
+    {
+      "leadId": "2d3071db-e187-4af8-ac04-35645b1e57cb",
+      "segment": "A-alto",
+      "score": 89.07,
+      "priority": 103.8879882818835,
+      "enqueuedAt": 1756156035981,
+      "status": "waiting"
+    },
+    {
+      "leadId": "c3aa2d8b-53bb-4881-8b68-6f7187827056",
+      "segment": "A-alto",
+      "score": 93.98,
+      "priority": 103.87515077728477,
+      "enqueuedAt": 1756158531426,
+      "status": "waiting"
+    },
+    {
+      "leadId": "2836749c-5619-426a-b013-976d30d3da70",
+      "segment": "A-alto",
+      "score": 85.62,
+      "priority": 103.80532444094193,
+      "enqueuedAt": 1757678085071,
+      "status": "waiting"
+    },
+    {
+      "leadId": "27859962-b833-4e37-89c3-4a9f9eb73bdc",
+      "segment": "A-alto",
+      "score": 88.64,
+      "priority": 103.77265056151778,
+      "enqueuedAt": 1757644433301,
+      "status": "waiting"
+    },
+    {
+      "leadId": "7d360d1a-c465-44ec-b918-b871dcda0e04",
+      "segment": "A-alto",
+      "score": 86.36,
+      "priority": 103.76440496222547,
+      "enqueuedAt": 1756926169784,
+      "status": "waiting"
+    },
+    {
+      "leadId": "2499a183-24bb-4c95-8deb-8e21af330fbd",
+      "segment": "A-alto",
+      "score": 88.64,
+      "priority": 103.72606981665898,
+      "enqueuedAt": 1757644976549,
+      "status": "waiting"
+    },
+    {
+      "leadId": "2b952920-375d-43f1-9592-4595179d32ac",
+      "segment": "A-alto",
+      "score": 86.5,
+      "priority": 103.70928031715384,
+      "enqueuedAt": 1756874046868,
+      "status": "waiting"
+    },
+    {
+      "leadId": "2ed63b83-4fca-4ed9-aade-2a089ad220a0",
+      "segment": "A-alto",
+      "score": 87.17,
+      "priority": 103.63268525400626,
+      "enqueuedAt": 1756158148484,
+      "status": "waiting"
+    },
+    {
+      "leadId": "9f9a7bac-7b5a-474e-a3f5-6d0e3b3135d6",
+      "segment": "A-alto",
+      "score": 86.49,
+      "priority": 103.62614299710933,
+      "enqueuedAt": 1757609694010,
+      "status": "waiting"
+    },
+    {
+      "leadId": "3a3f56e9-7977-4dbc-a0d1-e0a680aae0b9",
+      "segment": "A-alto",
+      "score": 89.1,
+      "priority": 103.62076055512959,
+      "enqueuedAt": 1756156036064,
+      "status": "waiting"
+    },
+    {
+      "leadId": "lead_5511988677635",
+      "segment": "A-alto",
+      "score": 86.35,
+      "priority": 103.61628902104295,
+      "enqueuedAt": 1757321658881,
+      "status": "waiting"
+    },
+    {
+      "leadId": "7e00e993-bc52-4b3c-b4ad-659edbbd7a7d",
+      "segment": "A-alto",
+      "score": 86.11,
+      "priority": 103.6092966497478,
+      "enqueuedAt": 1757605715835,
+      "status": "waiting"
+    },
+    {
+      "leadId": "0a7aa929-a925-4c71-8114-34cf1479450e",
+      "segment": "A-alto",
+      "score": 85.61,
+      "priority": 103.5935433002172,
+      "enqueuedAt": 1757676350229,
+      "status": "waiting"
+    },
+    {
+      "leadId": "e78f97ea-bdeb-4b5a-9481-2262357844a7",
+      "segment": "A-alto",
+      "score": 88.85,
+      "priority": 103.56795317476727,
+      "enqueuedAt": 1756156035678,
+      "status": "waiting"
+    },
+    {
+      "leadId": "f280a7a1-92e5-48f0-af0e-ef6fa1a7ed76",
+      "segment": "A-alto",
+      "score": 87.44,
+      "priority": 103.38095636903432,
+      "enqueuedAt": 1756156960357,
+      "status": "waiting"
+    },
+    {
+      "leadId": "985c63f0-6aa2-4acb-80cc-6124cdd3626e",
+      "segment": "A-alto",
+      "score": 93.93,
+      "priority": 103.3665094394292,
+      "enqueuedAt": 1756158532007,
+      "status": "waiting"
+    },
+    {
+      "leadId": "c504ae1f-a891-4941-81ec-6f49dcda062d",
+      "segment": "A-alto",
+      "score": 86.91,
+      "priority": 103.34521911806804,
+      "enqueuedAt": 1756158147715,
+      "status": "waiting"
+    },
+    {
+      "leadId": "2a114060-ae9f-4475-8c8d-fdb2d2bd1f6f",
+      "segment": "A-alto",
+      "score": 83.89,
+      "priority": 103.33798609108248,
+      "enqueuedAt": 1756905541986,
+      "status": "waiting"
+    },
+    {
+      "leadId": "f9cf2533-e866-4cab-beb7-30861756cfaf",
+      "segment": "A-alto",
+      "score": 85.9,
+      "priority": 103.33252943450722,
+      "enqueuedAt": 1756924202820,
+      "status": "waiting"
+    },
+    {
+      "leadId": "81d8513b-3503-43ae-89d7-bb69a3f0a15d",
+      "segment": "A-alto",
+      "score": 88.78,
+      "priority": 103.31960353365302,
+      "enqueuedAt": 1757639475760,
+      "status": "waiting"
+    },
+    {
+      "leadId": "3cca8920-9bca-45b5-a557-e5a3dde72825",
+      "segment": "A-alto",
+      "score": 88.98,
+      "priority": 103.29394701744253,
+      "enqueuedAt": 1756156035848,
+      "status": "waiting"
+    },
+    {
+      "leadId": "22a0ed9a-9294-4f36-ac84-00bdeda5572f",
+      "segment": "A-alto",
+      "score": 94.84,
+      "priority": 103.28525787301776,
+      "enqueuedAt": 1756158531885,
+      "status": "waiting"
+    },
+    {
+      "leadId": "3cfd0250-3b3f-4593-a0ce-c6041f1456a9",
+      "segment": "A-alto",
+      "score": 88.48,
+      "priority": 103.27133629222374,
+      "enqueuedAt": 1757646027876,
+      "status": "waiting"
+    },
+    {
+      "leadId": "75e1cfdd-7b3a-4ce9-ad6f-6d26fe291b4f",
+      "segment": "A-alto",
+      "score": 88.64,
+      "priority": 103.25880985194787,
+      "enqueuedAt": 1757645389601,
+      "status": "waiting"
+    },
+    {
+      "leadId": "2e59f6a5-78dc-4802-9f0b-37b8e40f672c",
+      "segment": "A-alto",
+      "score": 88.73,
+      "priority": 103.25656345321282,
+      "enqueuedAt": 1757630754239,
+      "status": "waiting"
+    },
+    {
+      "leadId": "2a0d62e0-aaf9-4230-a584-367d08ce48d1",
+      "segment": "A-alto",
+      "score": 85.79,
+      "priority": 103.2228004017505,
+      "enqueuedAt": 1757599950073,
+      "status": "waiting"
+    },
+    {
+      "leadId": "06948167-cf47-4f76-ab48-f56c658ab944",
+      "segment": "A-alto",
+      "score": 85.64,
+      "priority": 103.17978852344967,
+      "enqueuedAt": 1757598719026,
+      "status": "waiting"
+    },
+    {
+      "leadId": "dd76c3f2-8a95-4f3a-9061-b4c2227cde75",
+      "segment": "A-alto",
+      "score": 88.25,
+      "priority": 103.12009017546892,
+      "enqueuedAt": 1757362169843,
+      "status": "waiting"
+    },
+    {
+      "leadId": "lead_5521967444064",
+      "segment": "A-alto",
+      "score": 86.69,
+      "priority": 103.11528515371594,
+      "enqueuedAt": 1757317071697,
+      "status": "waiting"
+    },
+    {
+      "leadId": "25de44b1-f6d0-46d4-b823-f8ae5d2ceb4d",
+      "segment": "A-alto",
+      "score": 88.64,
+      "priority": 103.09808274314885,
+      "enqueuedAt": 1757643293220,
+      "status": "waiting"
+    },
+    {
+      "leadId": "73becc49-a1e1-4123-9b72-dd07dc8a784d",
+      "segment": "A-alto",
+      "score": 87.78,
+      "priority": 103.09297654378341,
+      "enqueuedAt": 1757617481256,
+      "status": "waiting"
+    },
+    {
+      "leadId": "75610201-3012-4576-a3d4-b1077f35f5be",
+      "segment": "A-alto",
+      "score": 85.49,
+      "priority": 103.02793238393585,
+      "enqueuedAt": 1756912411352,
+      "status": "waiting"
+    },
+    {
+      "leadId": "4752fcc2-b636-4686-9b9d-e79f26e7f5e9",
+      "segment": "A-alto",
+      "score": 83.87,
+      "priority": 103.0241009073297,
+      "enqueuedAt": 1756899825872,
+      "status": "waiting"
+    },
+    {
+      "leadId": "877c02e7-7edb-450c-9f0d-ace47333d556",
+      "segment": "A-alto",
+      "score": 86.48,
+      "priority": 103.01541478884502,
+      "enqueuedAt": 1757607105085,
+      "status": "waiting"
+    },
+    {
+      "leadId": "lead_5511985331007",
+      "segment": "A-alto",
+      "score": 85.61,
+      "priority": 102.9749480186535,
+      "enqueuedAt": 1757331088264,
+      "status": "waiting"
+    },
+    {
+      "leadId": "lead_5511988496921",
+      "segment": "A-alto",
+      "score": 86.31,
+      "priority": 102.94001122558558,
+      "enqueuedAt": 1757320136706,
+      "status": "waiting"
+    },
+    {
+      "leadId": "lead_5511930095126",
+      "segment": "A-alto",
+      "score": 86.36,
+      "priority": 102.90013815986669,
+      "enqueuedAt": 1757321812784,
+      "status": "waiting"
+    },
+    {
+      "leadId": "a951edcf-92c9-4324-aaca-8b25d5bbcea4",
+      "segment": "A-alto",
+      "score": 94.99,
+      "priority": 102.89134422128731,
+      "enqueuedAt": 1756158531375,
+      "status": "waiting"
+    },
+    {
+      "leadId": "ca680151-63bb-493a-9bc6-6c87f0d6eabb",
+      "segment": "A-alto",
+      "score": 85.89,
+      "priority": 102.88614119506978,
+      "enqueuedAt": 1756924195392,
+      "status": "waiting"
+    },
+    {
+      "leadId": "62457b2d-e756-4cff-bc90-44b09b3dc2fb",
+      "segment": "A-alto",
+      "score": 86.07,
+      "priority": 102.87212487320217,
+      "enqueuedAt": 1757668789000,
+      "status": "waiting"
+    },
+    {
+      "leadId": "4ac06966-2437-49d5-a536-b8dd055ef991",
+      "segment": "A-alto",
+      "score": 88.4,
+      "priority": 102.84997933218526,
+      "enqueuedAt": 1757646580665,
+      "status": "waiting"
+    },
+    {
+      "leadId": "ea81da77-1efd-431f-80f0-15f5f7043728",
+      "segment": "A-alto",
+      "score": 86.11,
+      "priority": 102.75389734583786,
+      "enqueuedAt": 1757606297902,
+      "status": "waiting"
+    },
+    {
+      "leadId": "26b39967-bcf6-49fa-8dae-a802e823482a",
+      "segment": "A-alto",
+      "score": 88.61,
+      "priority": 102.74466502047883,
+      "enqueuedAt": 1756156035043,
+      "status": "waiting"
+    },
+    {
+      "leadId": "c606628e-41aa-4f52-b255-67546598c9ae",
+      "segment": "A-alto",
+      "score": 83.73,
+      "priority": 102.72361243429492,
+      "enqueuedAt": 1756897828899,
+      "status": "waiting"
+    },
+    {
+      "leadId": "5ff8bcba-56ea-4ab2-b538-a0b20e72acfd",
+      "segment": "A-alto",
+      "score": 88.1,
+      "priority": 102.72024864893008,
+      "enqueuedAt": 1757650961422,
+      "status": "waiting"
+    },
+    {
+      "leadId": "7a652469-c486-4f05-bb6d-3cf56644b217",
+      "segment": "A-alto",
+      "score": 88.38,
+      "priority": 102.65342011439064,
+      "enqueuedAt": 1756156034956,
+      "status": "waiting"
+    },
+    {
+      "leadId": "lead_5521967730665",
+      "segment": "A-alto",
+      "score": 86.3,
+      "priority": 102.65168983518349,
+      "enqueuedAt": 1757319881512,
+      "status": "waiting"
+    },
+    {
+      "leadId": "lead_5521996209432",
+      "segment": "A-alto",
+      "score": 86.33,
+      "priority": 102.61615013076732,
+      "enqueuedAt": 1757320923717,
+      "status": "waiting"
+    },
+    {
+      "leadId": "lead_1757301763372_qnzaox6k7",
+      "segment": "A-alto",
+      "score": 86.1,
+      "priority": 102.57784064314437,
+      "enqueuedAt": 1757605400151,
+      "status": "waiting"
+    },
+    {
+      "leadId": "aa45f5f5-a3b8-453a-9326-4ac0b7ac51f5",
+      "segment": "A-alto",
+      "score": 88.63,
+      "priority": 102.51990164099693,
+      "enqueuedAt": 1757643099271,
+      "status": "waiting"
+    },
+    {
+      "leadId": "fbc9a050-d554-4ae6-b29a-6d4ae6eb5934",
+      "segment": "A-alto",
+      "score": 84.91,
+      "priority": 102.51491318982467,
+      "enqueuedAt": 1756916390080,
+      "status": "waiting"
+    },
+    {
+      "leadId": "13a15a14-291a-4191-bda6-0c8672d2128a",
+      "segment": "A-alto",
+      "score": 87.77,
+      "priority": 102.5024313626314,
+      "enqueuedAt": 1757617292889,
+      "status": "waiting"
+    },
+    {
+      "leadId": "c68d83ac-55fa-43cd-bf18-c4e552a57b8e",
+      "segment": "A-alto",
+      "score": 85.62,
+      "priority": 102.37213209672763,
+      "enqueuedAt": 1757677284080,
+      "status": "waiting"
+    },
+    {
+      "leadId": "56bfd034-797b-4945-81c1-c14cbdce1bcb",
+      "segment": "A-alto",
+      "score": 87.06,
+      "priority": 102.34784761630817,
+      "enqueuedAt": 1756157764168,
+      "status": "waiting"
+    },
+    {
+      "leadId": "3a4cf73c-3328-4f82-93b7-f6007d15a373",
+      "segment": "A-alto",
+      "score": 87.03,
+      "priority": 102.34020667494472,
+      "enqueuedAt": 1756158148073,
+      "status": "waiting"
+    },
+    {
+      "leadId": "b048e8d8-bbc6-40df-a323-578856610a18",
+      "segment": "A-alto",
+      "score": 85.54,
+      "priority": 102.29456791936454,
+      "enqueuedAt": 1757596764426,
+      "status": "waiting"
+    },
+    {
+      "leadId": "7a33470f-f8dd-4e13-8748-353438301698",
+      "segment": "A-alto",
+      "score": 85.88,
+      "priority": 102.29309600180844,
+      "enqueuedAt": 1756925628731,
+      "status": "waiting"
+    },
+    {
+      "leadId": "lead_5511939429638",
+      "segment": "A-alto",
+      "score": 85.61,
+      "priority": 102.28950215368519,
+      "enqueuedAt": 1757330897681,
+      "status": "waiting"
+    },
+    {
+      "leadId": "c80a0034-91f3-498d-8b33-2fa31520aeab",
+      "segment": "A-alto",
+      "score": 88.6,
+      "priority": 102.21620602793294,
+      "enqueuedAt": 1757365720431,
+      "status": "waiting"
+    },
+    {
+      "leadId": "df4a8f45-339d-44b3-9a55-3467e0cb6f31",
+      "segment": "A-alto",
+      "score": 84.9,
+      "priority": 102.1856068344801,
+      "enqueuedAt": 1756916377181,
+      "status": "waiting"
+    },
+    {
+      "leadId": "lead_5511972943254",
+      "segment": "A-alto",
+      "score": 86.68,
+      "priority": 102.17939044530401,
+      "enqueuedAt": 1757316662307,
+      "status": "waiting"
+    },
+    {
+      "leadId": "2a70703f-69e6-4efd-9992-a69f07c799a7",
+      "segment": "A-alto",
+      "score": 88.89,
+      "priority": 102.12795262312784,
+      "enqueuedAt": 1757632703659,
+      "status": "waiting"
+    },
+    {
+      "leadId": "f7599b6f-79d0-44f2-ab2d-085b69fe1857",
+      "segment": "A-alto",
+      "score": 88.78,
+      "priority": 102.08882493489897,
+      "enqueuedAt": 1757640935213,
+      "status": "waiting"
+    },
+    {
+      "leadId": "lead_5511960311352",
+      "segment": "A-alto",
+      "score": 85.61,
+      "priority": 102.08163579619227,
+      "enqueuedAt": 1757330830556,
+      "status": "waiting"
+    },
+    {
+      "leadId": "lead_5511911229901",
+      "segment": "A-alto",
+      "score": 85.61,
+      "priority": 102.06685098578481,
+      "enqueuedAt": 1757331234872,
+      "status": "waiting"
+    },
+    {
+      "leadId": "dc527cd5-2d02-4052-a430-7cc7196e6adb",
+      "segment": "A-alto",
+      "score": 87.26,
+      "priority": 102.03666637219244,
+      "enqueuedAt": 1756257615888,
+      "status": "waiting"
+    },
+    {
+      "leadId": "5d526c8a-8768-425d-adf9-8a594efaa731",
+      "segment": "A-alto",
+      "score": 88.25,
+      "priority": 101.96094332894185,
+      "enqueuedAt": 1757362281397,
+      "status": "waiting"
+    },
+    {
+      "leadId": "0326a512-e017-45ed-b88e-820f3eb11ee7",
+      "segment": "A-alto",
+      "score": 86.48,
+      "priority": 101.88643033454653,
+      "enqueuedAt": 1757607615536,
+      "status": "waiting"
+    },
+    {
+      "leadId": "e14a5127-0f11-4900-a960-b27eba41c04f",
+      "segment": "A-alto",
+      "score": 89.03,
+      "priority": 101.88556192154388,
+      "enqueuedAt": 1756156035906,
+      "status": "waiting"
+    },
+    {
+      "leadId": "f08f8bec-4c56-4167-89f0-6a614ec9330b",
+      "segment": "A-alto",
+      "score": 96.02,
+      "priority": 101.84697727957405,
+      "enqueuedAt": 1756158532315,
+      "status": "waiting"
+    },
+    {
+      "leadId": "bebe0c91-3bd0-4e00-9bc5-d195a45251a3",
+      "segment": "A-alto",
+      "score": 88.89,
+      "priority": 101.84400713547986,
+      "enqueuedAt": 1757631990149,
+      "status": "waiting"
+    },
+    {
+      "leadId": "263aff61-e56d-4ebd-8edd-fc4e0de27a7f",
+      "segment": "A-alto",
+      "score": 85.79,
+      "priority": 101.75924472901401,
+      "enqueuedAt": 1757600665180,
+      "status": "waiting"
+    },
+    {
+      "leadId": "a165a454-a378-4c9e-976f-dd2680cfcc99",
+      "segment": "A-alto",
+      "score": 86.99,
+      "priority": 101.74915153481908,
+      "enqueuedAt": 1756158147881,
+      "status": "waiting"
+    },
+    {
+      "leadId": "4c6912f5-7cf6-408d-9840-efc7e7151b9e",
+      "segment": "A-alto",
+      "score": 85.56,
+      "priority": 101.73916838947014,
+      "enqueuedAt": 1757680596340,
+      "status": "waiting"
+    },
+    {
+      "leadId": "bb82b4d5-61e8-4d04-b6a0-93b612282dd2",
+      "segment": "A-alto",
+      "score": 86.1,
+      "priority": 101.72847701067306,
+      "enqueuedAt": 1757604624168,
+      "status": "waiting"
+    },
+    {
+      "leadId": "lead_5511978100934",
+      "segment": "A-alto",
+      "score": 86.29,
+      "priority": 101.67765130027774,
+      "enqueuedAt": 1757318466026,
+      "status": "waiting"
+    },
+    {
+      "leadId": "lead_5511555444333",
+      "segment": "A-alto",
+      "score": 87.04,
+      "priority": 101.66278088841189,
+      "enqueuedAt": 1756957917698,
+      "status": "waiting"
+    },
+    {
+      "leadId": "lead_5521999999999",
+      "segment": "A-alto",
+      "score": 85.62,
+      "priority": 101.6413413860555,
+      "enqueuedAt": 1757332168201,
+      "status": "waiting"
+    },
+    {
+      "leadId": "7dcdc067-fd79-47fe-9833-6068d4fb8cda",
+      "segment": "A-alto",
+      "score": 87.14,
+      "priority": 101.6146635553008,
+      "enqueuedAt": 1756158148435,
+      "status": "waiting"
+    },
+    {
+      "leadId": "ea8035c3-28ff-4cb5-9065-97eca8b025a6",
+      "segment": "A-alto",
+      "score": 85.79,
+      "priority": 101.60994540205621,
+      "enqueuedAt": 1757600060594,
+      "status": "waiting"
+    },
+    {
+      "leadId": "da622c8a-6cbe-4b55-a209-e8f1751bab47",
+      "segment": "A-alto",
+      "score": 89.29,
+      "priority": 101.54200022757139,
+      "enqueuedAt": 1757646039680,
+      "status": "waiting"
+    },
+    {
+      "leadId": "78f560eb-02cd-4d80-bf5e-14ff587a97a6",
+      "segment": "A-alto",
+      "score": 85.6,
+      "priority": 101.48894612649633,
+      "enqueuedAt": 1757598208803,
+      "status": "waiting"
+    },
+    {
+      "leadId": "30fed136-8621-4f10-bfce-3d9db7a72031",
+      "segment": "A-alto",
+      "score": 88.92,
+      "priority": 101.47358653499624,
+      "enqueuedAt": 1756156035767,
+      "status": "waiting"
+    },
+    {
+      "leadId": "f5bad6e0-f3c4-4385-a052-4e966e87920c",
+      "segment": "A-alto",
+      "score": 86.48,
+      "priority": 101.46775118900318,
+      "enqueuedAt": 1757607429911,
+      "status": "waiting"
+    },
+    {
+      "leadId": "lead_5511123456789",
+      "segment": "A-alto",
+      "score": 87.03,
+      "priority": 101.4671348109612,
+      "enqueuedAt": 1756957916837,
+      "status": "waiting"
+    },
+    {
+      "leadId": "lead_5521970743600",
+      "segment": "A-alto",
+      "score": 86.32,
+      "priority": 101.44611284778759,
+      "enqueuedAt": 1757320670306,
+      "status": "waiting"
+    },
+    {
+      "leadId": "31c1b01a-e11f-4e7b-a4f9-9b594c0d460e",
+      "segment": "A-alto",
+      "score": 88.27,
+      "priority": 101.42478604551019,
+      "enqueuedAt": 1757363115282,
+      "status": "waiting"
+    },
+    {
+      "leadId": "793399ed-f006-4fcc-b006-cf7ab9b5bbd1",
+      "segment": "A-alto",
+      "score": 87.71,
+      "priority": 101.4132530761506,
+      "enqueuedAt": 1756157355497,
+      "status": "waiting"
+    },
+    {
+      "leadId": "f38d0fce-bd31-4369-bc95-ec4c053025a8",
+      "segment": "A-alto",
+      "score": 85.81,
+      "priority": 101.38717732656472,
+      "enqueuedAt": 1757689124545,
+      "status": "waiting"
+    },
+    {
+      "leadId": "b9a661d6-875c-4737-84f9-d471b77fb4bf",
+      "segment": "A-alto",
+      "score": 88.64,
+      "priority": 101.38357996470417,
+      "enqueuedAt": 1757643829058,
+      "status": "waiting"
+    },
+    {
+      "leadId": "a4d53ece-ba19-484c-9838-7356d88760c7",
+      "segment": "A-alto",
+      "score": 88.76,
+      "priority": 101.37477557046122,
+      "enqueuedAt": 1756156035307,
+      "status": "waiting"
+    },
+    {
+      "leadId": "12bd64b6-15d3-4e53-8331-91c191ab32e7",
+      "segment": "A-alto",
+      "score": 85.57,
+      "priority": 101.36688741311333,
+      "enqueuedAt": 1757598282102,
+      "status": "waiting"
+    },
+    {
+      "leadId": "ac485673-f715-4715-962c-0c5615e249ee",
+      "segment": "A-alto",
+      "score": 86.95,
+      "priority": 101.31694839144032,
+      "enqueuedAt": 1756158147827,
+      "status": "waiting"
+    },
+    {
+      "leadId": "69765793-a8b6-4ec0-af79-2f0437e5a9c2",
+      "segment": "A-alto",
+      "score": 83.77,
+      "priority": 101.27414196546012,
+      "enqueuedAt": 1756898989897,
+      "status": "waiting"
+    },
+    {
+      "leadId": "313b1f30-e941-471e-8032-c40c5c13a416",
+      "segment": "A-alto",
+      "score": 86.11,
+      "priority": 101.2286059153881,
+      "enqueuedAt": 1757605439610,
+      "status": "waiting"
+    },
+    {
+      "leadId": "lead_5511952038514",
+      "segment": "A-alto",
+      "score": 85.99,
+      "priority": 101.2277042376155,
+      "enqueuedAt": 1757322012761,
+      "status": "waiting"
+    },
+    {
+      "leadId": "7eca3e8a-8028-430c-9297-ec6ded157cf4",
+      "segment": "A-alto",
+      "score": 83.74,
+      "priority": 101.19578464576391,
+      "enqueuedAt": 1756898325558,
+      "status": "waiting"
+    },
+    {
+      "leadId": "3d758cc8-1294-441b-8850-3bb541715b2b",
+      "segment": "A-alto",
+      "score": 85.8,
+      "priority": 101.19374014253422,
+      "enqueuedAt": 1757601338840,
+      "status": "waiting"
+    },
+    {
+      "leadId": "lead_5541999777777",
+      "segment": "A-alto",
+      "score": 85.78,
+      "priority": 101.1878358910285,
+      "enqueuedAt": 1757327816224,
+      "status": "waiting"
+    },
+    {
+      "leadId": "0994c8b0-e5da-44ad-ac3d-281342e6864b",
+      "segment": "A-alto",
+      "score": 89.47,
+      "priority": 101.14687072953292,
+      "enqueuedAt": 1757646046145,
+      "status": "waiting"
+    },
+    {
+      "leadId": "2c8c6660-c902-494c-8604-499d76c6ebd0",
+      "segment": "A-alto",
+      "score": 83.76,
+      "priority": 101.14044580098519,
+      "enqueuedAt": 1756903459093,
+      "status": "waiting"
+    },
+    {
+      "leadId": "9a64289e-4686-43e3-a758-8ca3e4d62c6b",
+      "segment": "A-alto",
+      "score": 88.1,
+      "priority": 101.13522874555942,
+      "enqueuedAt": 1757650304582,
+      "status": "waiting"
+    },
+    {
+      "leadId": "90432784-beca-43c8-b1f9-a18bb464db34",
+      "segment": "A-alto",
+      "score": 85.8,
+      "priority": 101.0927808050688,
+      "enqueuedAt": 1757600988015,
+      "status": "waiting"
+    },
+    {
+      "leadId": "lead_5511978968651",
+      "segment": "A-alto",
+      "score": 86.3,
+      "priority": 101.07278642014637,
+      "enqueuedAt": 1757319918987,
+      "status": "waiting"
+    },
+    {
+      "leadId": "53493ae9-f42c-4fb5-860e-bce4ae2d5849",
+      "segment": "A-alto",
+      "score": 87.24,
+      "priority": 101.04878995044166,
+      "enqueuedAt": 1756158148684,
+      "status": "waiting"
+    },
+    {
+      "leadId": "1fe9264c-0f18-49de-959c-42026a30bae7",
+      "segment": "A-alto",
+      "score": 85.61,
+      "priority": 101.04109757575715,
+      "enqueuedAt": 1757675367617,
+      "status": "waiting"
+    },
+    {
+      "leadId": "lead_5521964421370",
+      "segment": "A-alto",
+      "score": 83.97,
+      "priority": 100.976615046358,
+      "enqueuedAt": 1756992730730,
+      "status": "waiting"
+    },
+    {
+      "leadId": "2e1294c8-97ee-4698-b286-0999d4756243",
+      "segment": "A-alto",
+      "score": 88.52,
+      "priority": 100.97441822707825,
+      "enqueuedAt": 1757646031392,
+      "status": "waiting"
+    },
+    {
+      "leadId": "lead_5511973157680",
+      "segment": "A-alto",
+      "score": 86.67,
+      "priority": 100.96969018514773,
+      "enqueuedAt": 1757315959688,
+      "status": "waiting"
+    },
+    {
+      "leadId": "dbd6b588-1059-40cb-9e19-0a1793088762",
+      "segment": "A-alto",
+      "score": 85.59,
+      "priority": 100.96253355770189,
+      "enqueuedAt": 1757598204020,
+      "status": "waiting"
+    },
+    {
+      "leadId": "c65adcb8-dff0-48b0-9900-812a03ec2ffa",
+      "segment": "A-alto",
+      "score": 88.78,
+      "priority": 100.94341194573965,
+      "enqueuedAt": 1757639947900,
+      "status": "waiting"
+    },
+    {
+      "leadId": "lead_5541999999999",
+      "segment": "A-alto",
+      "score": 85.77,
+      "priority": 100.91796271693123,
+      "enqueuedAt": 1757327184653,
+      "status": "waiting"
+    },
+    {
+      "leadId": "a1026a68-7769-4ebd-ad4c-b462c49b2b61",
+      "segment": "A-alto",
+      "score": 84.48,
+      "priority": 100.89571615361263,
+      "enqueuedAt": 1756912422790,
+      "status": "waiting"
+    },
+    {
+      "leadId": "29d49f0a-ea81-4627-87e1-e8dbdeadf60a",
+      "segment": "A-alto",
+      "score": 83.77,
+      "priority": 100.86627275686865,
+      "enqueuedAt": 1756898437574,
+      "status": "waiting"
+    },
+    {
+      "leadId": "lead_5511943725934",
+      "segment": "A-alto",
+      "score": 86.71,
+      "priority": 100.84311396962691,
+      "enqueuedAt": 1757318361162,
+      "status": "waiting"
+    },
+    {
+      "leadId": "f38d3f15-ba56-4638-b3c8-a6c3dc46e225",
+      "segment": "A-alto",
+      "score": 85.61,
+      "priority": 100.84008200454441,
+      "enqueuedAt": 1757675929440,
+      "status": "waiting"
+    },
+    {
+      "leadId": "7429cb53-35e1-4971-9e68-03427cf45334",
+      "segment": "A-alto",
+      "score": 88.26,
+      "priority": 100.82880544331827,
+      "enqueuedAt": 1757362822606,
+      "status": "waiting"
+    },
+    {
+      "leadId": "5c687ade-8ceb-41cf-adcf-67846de44817",
+      "segment": "A-alto",
+      "score": 85.78,
+      "priority": 100.81855594502349,
+      "enqueuedAt": 1757599521148,
+      "status": "waiting"
+    },
+    {
+      "leadId": "d5f2c811-1fb9-418e-bbeb-6bdb13e5310c",
+      "segment": "A-alto",
+      "score": 85.55,
+      "priority": 100.81244824426743,
+      "enqueuedAt": 1757597893350,
+      "status": "waiting"
+    },
+    {
+      "leadId": "31bf039d-48d7-40c7-b343-edd1cba5a184",
+      "segment": "A-alto",
+      "score": 88.25,
+      "priority": 100.81190896822109,
+      "enqueuedAt": 1757362309054,
+      "status": "waiting"
+    },
+    {
+      "leadId": "f5da531b-1c97-4367-8706-ebc04e294097",
+      "segment": "A-alto",
+      "score": 88.78,
+      "priority": 100.78392959931972,
+      "enqueuedAt": 1757640172995,
+      "status": "waiting"
+    },
+    {
+      "leadId": "36f4056e-97de-4cf1-8c68-3ab506def5c9",
+      "segment": "A-alto",
+      "score": 93.51,
+      "priority": 100.77136918742895,
+      "enqueuedAt": 1756158532161,
+      "status": "waiting"
+    },
+    {
+      "leadId": "e0318035-1e97-4b5c-8bda-44d6152e2cda",
+      "segment": "A-alto",
+      "score": 85.86,
+      "priority": 100.74904117143002,
+      "enqueuedAt": 1756925009789,
+      "status": "waiting"
+    },
+    {
+      "leadId": "5c8bd07e-f4df-4671-9be5-99c1bfe0a34a",
+      "segment": "A-alto",
+      "score": 86.07,
+      "priority": 100.7419326637503,
+      "enqueuedAt": 1757668148776,
+      "status": "waiting"
+    },
+    {
+      "leadId": "fca65a3e-0e72-4556-9047-2e8838d46350",
+      "segment": "A-alto",
+      "score": 86.12,
+      "priority": 100.66070917531961,
+      "enqueuedAt": 1757669796080,
+      "status": "waiting"
+    },
+    {
+      "leadId": "c41ede3b-93e1-4a0d-9cf9-64e86917df1a",
+      "segment": "A-alto",
+      "score": 88.4,
+      "priority": 100.64755702421444,
+      "enqueuedAt": 1757647816109,
+      "status": "waiting"
+    },
+    {
+      "leadId": "aeea7fb5-cbbe-4617-8176-829bd1762134",
+      "segment": "A-alto",
+      "score": 86.09,
+      "priority": 100.63040555455318,
+      "enqueuedAt": 1757603035707,
+      "status": "waiting"
+    },
+    {
+      "leadId": "9aeaeedc-657c-4903-9499-0471e33f2179",
+      "segment": "A-alto",
+      "score": 86.17,
+      "priority": 100.60316644904756,
+      "enqueuedAt": 1757692486707,
+      "status": "waiting"
+    },
+    {
+      "leadId": "695e24f2-10b8-4bf0-a854-9e8287359a60",
+      "segment": "A-alto",
+      "score": 90.96,
+      "priority": 100.60126236553234,
+      "enqueuedAt": 1756155968800,
+      "status": "waiting"
+    },
+    {
+      "leadId": "e5752ea4-08bf-44c0-872f-09daf9dae47f",
+      "segment": "A-alto",
+      "score": 86.48,
+      "priority": 100.574183920139,
+      "enqueuedAt": 1757606786725,
+      "status": "waiting"
+    },
+    {
+      "leadId": "lead_5511978658966",
+      "segment": "A-alto",
+      "score": 85.6,
+      "priority": 100.55336323013306,
+      "enqueuedAt": 1757330697178,
+      "status": "waiting"
+    },
+    {
+      "leadId": "lead_5521980293157",
+      "segment": "A-alto",
+      "score": 86.67,
+      "priority": 100.50304088365381,
+      "enqueuedAt": 1757316194501,
+      "status": "waiting"
+    },
+    {
+      "leadId": "596b6381-fc01-45c1-ac7f-d16772873245",
+      "segment": "A-alto",
+      "score": 89.38,
+      "priority": 100.48554728282849,
+      "enqueuedAt": 1757643492961,
+      "status": "waiting"
+    },
+    {
+      "leadId": "lead_5522997208460",
+      "segment": "A-alto",
+      "score": 86.32,
+      "priority": 100.44921667391485,
+      "enqueuedAt": 1757320904611,
+      "status": "waiting"
+    },
+    {
+      "leadId": "afdae400-ee12-4c78-8e8b-7474cc02f18e",
+      "segment": "A-alto",
+      "score": 89.46,
+      "priority": 100.43870431903605,
+      "enqueuedAt": 1757646046693,
+      "status": "waiting"
+    },
+    {
+      "leadId": "2b7d9f0b-1514-4f4d-97e3-718bfc6045cc",
+      "segment": "A-alto",
+      "score": 83.76,
+      "priority": 100.41309031416587,
+      "enqueuedAt": 1756898379170,
+      "status": "waiting"
+    },
+    {
+      "leadId": "lead_5541999666666",
+      "segment": "A-alto",
+      "score": 85.78,
+      "priority": 100.38546907228672,
+      "enqueuedAt": 1757327833572,
+      "status": "waiting"
+    },
+    {
+      "leadId": "8746d2cc-9796-46a3-8756-9f10de6576ca",
+      "segment": "A-alto",
+      "score": 88.25,
+      "priority": 100.3831745414238,
+      "enqueuedAt": 1757362028136,
+      "status": "waiting"
+    },
+    {
+      "leadId": "798458ad-4e8c-405a-aa7d-64636b7465aa",
+      "segment": "A-alto",
+      "score": 87.58,
+      "priority": 100.17058984413222,
+      "enqueuedAt": 1756157187294,
+      "status": "waiting"
+    },
+    {
+      "leadId": "1906bb47-5fb6-4ca0-acc0-fa0b6716506d",
+      "segment": "A-alto",
+      "score": 86.1,
+      "priority": 100.16720943802797,
+      "enqueuedAt": 1757603869973,
+      "status": "waiting"
+    },
+    {
+      "leadId": "9bb451b6-fe67-4345-852d-bd93df75855e",
+      "segment": "A-alto",
+      "score": 86.39,
+      "priority": 100.1506121800225,
+      "enqueuedAt": 1756926499015,
+      "status": "waiting"
+    },
+    {
+      "leadId": "e2e73da5-663f-4026-915a-9b64b5fa85f0",
+      "segment": "A-alto",
+      "score": 88.27,
+      "priority": 100.09644385684477,
+      "enqueuedAt": 1757363331401,
+      "status": "waiting"
+    },
+    {
+      "leadId": "437b483f-c77d-419d-88a5-ffc0ee875c6d",
+      "segment": "A-alto",
+      "score": 88.73,
+      "priority": 100.01238002501549,
+      "enqueuedAt": 1757630184610,
+      "status": "waiting"
+    }
+  ],
+  "agents": []
+}

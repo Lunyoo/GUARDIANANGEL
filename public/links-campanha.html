@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guardian Angel - Links de Campanha</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .link-box {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: white;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: block;
+        }
+        .link-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(37, 211, 102, 0.3);
+        }
+        .link-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .link-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .emoji {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔥 Guardian Angel - Links de Campanha 🔥</h1>
+            <p>Clique no link que corresponde ao seu vídeo:</p>
+        </div>
+
+        <!-- Link 1: Vídeo da Cliente Satisfeita -->
+        <a href="#" class="link-box" onclick="abrirWhatsApp('video1', 'Oi! Vi o vídeo da cliente que perdeu peso com a calcinha! Quero saber mais sobre como funciona e se entregam na minha cidade!')">
+            <div class="link-title">
+                <span class="emoji">👩‍🦱</span>Vídeo: Cliente que Emagreceu
+            </div>
+            <div class="link-subtitle">
+                "Vi o depoimento da mulher que perdeu peso!"
+            </div>
+        </a>
+
+        <!-- Link 2: Vídeo do Produto -->
+        <a href="#" class="link-box" onclick="abrirWhatsApp('video2', 'Olá! Assisti o vídeo mostrando o produto e fiquei interessada! Gostaria de saber o preço e como posso comprar. Vocês entregam na minha região?')">
+            <div class="link-title">
+                <span class="emoji">👙</span>Vídeo: Demonstração do Produto
+            </div>
+            <div class="link-subtitle">
+                "Vi como o produto funciona e quero comprar!"
+            </div>
+        </a>
+
+        <!-- Link 3: Vídeo da Modelo -->
+        <a href="#" class="link-box" onclick="abrirWhatsApp('video3', 'Oi! Vi o vídeo da modelo usando a calcinha e adorei o resultado! Quero uma igual pra mim! Como faço pra comprar? Qual o valor?')">
+            <div class="link-title">
+                <span class="emoji">🔥</span>Vídeo: Modelo com Resultado
+            </div>
+            <div class="link-subtitle">
+                "Vi a modelo com resultado incrível!"
+            </div>
+        </a>
+
+        <div style="margin-top: 30px; text-align: center; color: #666; font-size: 12px;">
+            <p>⚡ Sistema Guardian Angel - Powered by Neural Control ⚡</p>
+        </div>
+    </div>
+
+    <script>
+        function abrirWhatsApp(videoTipo, mensagem) {
+            // Número do WhatsApp (substitua pelo seu número)
+            const numeroWhatsApp = '5531999999999';
+            
+            // Adiciona identificador do vídeo na mensagem para o sistema rastrear
+            const mensagemCompleta = `[${videoTipo.toUpperCase()}] ${mensagem}`;
+            
+            // Codifica a mensagem para URL
+            const mensagemCodificada = encodeURIComponent(mensagemCompleta);
+            
+            // Cria o link do WhatsApp
+            const linkWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${mensagemCodificada}`;
+            
+            // Abre o WhatsApp
+            window.open(linkWhatsApp, '_blank');
+            
+            // Analytics: Registra o clique (opcional)
+            try {
+                fetch('/api/analytics/track-click', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        videoTipo: videoTipo,
+                        timestamp: new Date().toISOString(),
+                        userAgent: navigator.userAgent
+                    })
+                });
+            } catch (e) {
+                console.log('Analytics tracking failed:', e);
+            }
+        }
+    </script>
+</body>
+</html>

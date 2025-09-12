@@ -18,7 +18,7 @@ export function useRealTime() {
   const [ultimaAtualizacao, setUltimaAtualizacao] = useState<Date | null>(null)
   const [isAutoUpdateEnabled, setIsAutoUpdateEnabled] = useState(true)
   
-  const intervalRef = useRef<NodeJS.Timeout>()
+  const intervalRef = useRef<NodeJS.Timeout | null>(null)
   const isLoadingRef = useRef(false)
 
   const carregarDados = async (isAutoUpdate = false) => {

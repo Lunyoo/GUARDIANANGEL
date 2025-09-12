@@ -1,216 +1,115 @@
 import { Router } from 'express'
-import { prisma } from '../server'
+import { getDatabase } from '../config/database.js'
 import { asyncHandler } from '../middleware/errorHandler'
-import { AuthenticatedRequest } from '../middleware/auth'
+import type { Request } from 'express'
+// Using local AuthRequest shape consistent with auth middleware
+interface AuthRequest extends Request { user?: any }
 import { logger } from '../utils/logger'
 
 const router = Router()
 
 // Buscar campanhas do usuário
-router.get('/', asyncHandler(async (req: AuthenticatedRequest, res) => {
-  const campanhas = await prisma.campanha.findMany({
-    include: {
-      criativos: {
-        select: {
-          id: true,
-          nome: true,
-          tipo: true,
-          status: true,
-          impressoes: true,
-          cliques: true,
-          gasto: true,
-          ctr: true
-        }
-      },
-      _count: {
-        select: {
-          criativos: true
-        }
+router.get('/', asyncHandler(async (req: AuthRequest, res) => {
+  const db = getDatabase()
+  // Basic campaigns table may not exist; we simulate from campaigns_cache if present
+  try {
+    const rows = db.prepare('SELECT id, data, cached_at as updatedAt FROM campaigns_cache ORDER BY cached_at DESC LIMIT 50').all()
+  const campanhas = (rows as any[]).map((r: any) => {
+      let parsed: any = {}
+      try { parsed = JSON.parse(r.data) } catch {}
+      return {
+        id: r.id,
+        nome: parsed.name || parsed.nome || 'Campanha',
+        status: parsed.status || 'ACTIVE',
+        updatedAt: r.updatedAt,
+        criativos: parsed.creatives || [],
+        _count: { criativos: (parsed.creatives||[]).length }
       }
-    },
-    orderBy: {
-      updatedAt: 'desc'
-    }
-  })
-
-  // Calcular métricas agregadas
-  const campanhasComMetricas = campanhas.map(campanha => {
-    const totalCriativos = campanha._count.criativos
-    const criativosAtivos = campanha.criativos.filter(c => c.status === 'ACTIVE').length
-    
-    return {
-      ...campanha,
-      totalCriativos,
-      criativosAtivos,
-      performanceScore: calcularPerformanceScore(campanha)
-    }
-  })
-
-  res.json(campanhasComMetricas)
+    })
+    const campanhasComMetricas = campanhas.map(c => ({
+      ...c,
+      totalCriativos: c._count.criativos,
+      criativosAtivos: c.criativos.filter((x:any)=> x.status==='ACTIVE').length,
+      performanceScore: calcularPerformanceScore(c)
+    }))
+    return res.json(campanhasComMetricas)
+  } catch (e) {
+    return res.json([])
+  }
 }))
 
 // Buscar campanha específica
-router.get('/:id', asyncHandler(async (req: AuthenticatedRequest, res) => {
+router.get('/:id', asyncHandler(async (req: AuthRequest, res) => {
   const { id } = req.params
-
-  const campanha = await prisma.campanha.findUnique({
-    where: { id },
-    include: {
-      criativos: true,
-      insights: {
-        orderBy: {
-          createdAt: 'desc'
-        }
-      }
-    }
-  })
-
-  if (!campanha) {
-    return res.status(404).json({
-      error: 'Campanha não encontrada'
-    })
+  const db = getDatabase()
+  try {
+  const row: any = db.prepare('SELECT id, data, cached_at as updatedAt FROM campaigns_cache WHERE id = ?').get(id)
+  if (!row) return res.status(404).json({ error: 'Campanha não encontrada' })
+  let parsed: any = {}
+  try { parsed = JSON.parse(row.data || '{}') } catch {}
+  return res.json({ id: row.id, ...parsed, updatedAt: row.updatedAt })
+  } catch {
+    return res.status(404).json({ error: 'Campanha não encontrada' })
   }
-
-  res.json(campanha)
 }))
 
-// Buscar métricas de performance
-router.get('/:id/metrics', asyncHandler(async (req: AuthenticatedRequest, res) => {
+router.get('/:id/metrics', asyncHandler(async (req: AuthRequest, res) => {
   const { id } = req.params
   const { periodo = '30' } = req.query
-
-  const diasAtras = parseInt(periodo as string)
-  const dataInicio = new Date(Date.now() - diasAtras * 24 * 60 * 60 * 1000)
-
-  // Buscar dados históricos (simulado - em produção viria de uma tabela de métricas históricas)
-  const metricas = await prisma.campanha.findUnique({
-    where: { id },
-    include: {
-      criativos: {
-        select: {
-          impressoes: true,
-          cliques: true,
-          gasto: true,
-          conversoes: true
-        }
-      }
-    }
-  })
-
-  if (!metricas) {
-    return res.status(404).json({
-      error: 'Campanha não encontrada'
-    })
+  const db = getDatabase()
+  try {
+  const row: any = db.prepare('SELECT data FROM campaigns_cache WHERE id = ?').get(id)
+  if (!row) return res.status(404).json({ error: 'Campanha não encontrada' })
+  let parsed: any = {}
+  try { parsed = JSON.parse(row.data || '{}') } catch {}
+    const criativos = parsed.creatives || []
+    const totais = criativos.reduce((acc: any, c: any) => ({
+      impressoes: acc.impressoes + (c.impressoes||0),
+      cliques: acc.cliques + (c.cliques||0),
+      gasto: acc.gasto + (c.gasto||0),
+      conversoes: acc.conversoes + (c.conversoes||0)
+    }), { impressoes:0, cliques:0, gasto:0, conversoes:0 })
+    const ctr = totais.impressoes ? (totais.cliques / totais.impressoes) * 100 : 0
+    const cpm = totais.impressoes ? (totais.gasto / totais.impressoes) * 1000 : 0
+    const cpc = totais.cliques ? totais.gasto / totais.cliques : 0
+    const roas = totais.gasto ? ((totais.conversoes||0) * (parsed.receita||0)) / totais.gasto : 0
+    return res.json({ periodo: `${periodo} dias`, metricas: { ...totais, ctr, cpm, cpc, roas } })
+  } catch {
+    return res.status(404).json({ error: 'Campanha não encontrada' })
   }
-
-  // Agregar métricas
-  const totais = metricas.criativos.reduce((acc, criativo) => ({
-    impressoes: acc.impressoes + criativo.impressoes,
-    cliques: acc.cliques + criativo.cliques,
-    gasto: acc.gasto + criativo.gasto,
-    conversoes: acc.conversoes + criativo.conversoes
-  }), { impressoes: 0, cliques: 0, gasto: 0, conversoes: 0 })
-
-  const ctr = totais.impressoes > 0 ? (totais.cliques / totais.impressoes) * 100 : 0
-  const cpm = totais.impressoes > 0 ? (totais.gasto / totais.impressoes) * 1000 : 0
-  const cpc = totais.cliques > 0 ? totais.gasto / totais.cliques : 0
-  const roas = totais.gasto > 0 ? (totais.conversoes * metricas.receita) / totais.gasto : 0
-
-  res.json({
-    periodo: `${periodo} dias`,
-    metricas: {
-      ...totais,
-      ctr: Number(ctr.toFixed(2)),
-      cpm: Number(cpm.toFixed(2)),
-      cpc: Number(cpc.toFixed(2)),
-      roas: Number(roas.toFixed(2))
-    },
-    tendencias: {
-      impressoes: Math.random() > 0.5 ? 'up' : 'down',
-      cliques: Math.random() > 0.5 ? 'up' : 'down',
-      ctr: Math.random() > 0.5 ? 'up' : 'down',
-      gasto: Math.random() > 0.5 ? 'up' : 'down'
-    }
-  })
 }))
 
 // Atualizar campanha
-router.patch('/:id', asyncHandler(async (req: AuthenticatedRequest, res) => {
+router.patch('/:id', asyncHandler(async (req: AuthRequest, res) => {
   const { id } = req.params
-  const { nome, status, orcamento } = req.body
-
-  const campanha = await prisma.campanha.update({
-    where: { id },
-    data: {
-      ...(nome && { nome }),
-      ...(status && { status }),
-      ...(orcamento && { orcamento: parseFloat(orcamento) }),
-      updatedAt: new Date()
-    }
-  })
-
-  // Log de auditoria
-  await prisma.auditLog.create({
-    data: {
-      userId: req.user!.id,
-      action: 'UPDATE',
-      resource: 'campanha',
-      resourceId: id,
-      newData: { nome, status, orcamento }
-    }
-  })
-
-  logger.info(`Campanha atualizada: ${id}`, { userId: req.user!.id, changes: { nome, status, orcamento } })
-
-  res.json(campanha)
+  const { nome, status } = req.body
+  const db = getDatabase()
+  // For cache-backed campaigns we update cached JSON if exists
+  const row: any = db.prepare('SELECT data FROM campaigns_cache WHERE id = ?').get(id)
+  if (!row) return res.status(404).json({ error: 'Campanha não encontrada' })
+  let parsed: any = {}
+  try { parsed = JSON.parse(row.data || '{}') } catch {}
+  if (nome) parsed.nome = nome
+  if (status) parsed.status = status
+  db.prepare('UPDATE campaigns_cache SET data = ?, cached_at = CURRENT_TIMESTAMP WHERE id = ?').run(JSON.stringify(parsed), id)
+  logger.info(`Campanha atualizada: ${id}`, { userId: req.user?.id, changes: { nome, status } })
+  res.json({ id, ...parsed })
 }))
 
 // Pausar/Ativar campanha
-router.post('/:id/toggle', asyncHandler(async (req: AuthenticatedRequest, res) => {
+router.post('/:id/toggle', asyncHandler(async (req: AuthRequest, res) => {
   const { id } = req.params
-
-  const campanha = await prisma.campanha.findUnique({
-    where: { id }
-  })
-
-  if (!campanha) {
-    return res.status(404).json({
-      error: 'Campanha não encontrada'
-    })
-  }
-
-  const novoStatus = campanha.status === 'ACTIVE' ? 'PAUSED' : 'ACTIVE'
-
-  const campanhaAtualizada = await prisma.campanha.update({
-    where: { id },
-    data: {
-      status: novoStatus,
-      updatedAt: new Date()
-    }
-  })
-
-  // Log de auditoria
-  await prisma.auditLog.create({
-    data: {
-      userId: req.user!.id,
-      action: 'TOGGLE_STATUS',
-      resource: 'campanha',
-      resourceId: id,
-      oldData: { status: campanha.status },
-      newData: { status: novoStatus }
-    }
-  })
-
-  logger.info(`Status da campanha alterado: ${id}`, { 
-    userId: req.user!.id, 
-    statusAnterior: campanha.status, 
-    novoStatus 
-  })
-
-  res.json({
-    message: `Campanha ${novoStatus === 'ACTIVE' ? 'ativada' : 'pausada'} com sucesso`,
-    campanha: campanhaAtualizada
-  })
+  const db = getDatabase()
+  const row: any = db.prepare('SELECT data FROM campaigns_cache WHERE id = ?').get(id)
+  if (!row) return res.status(404).json({ error: 'Campanha não encontrada' })
+  let parsed: any = {}
+  try { parsed = JSON.parse(row.data || '{}') } catch {}
+  const currentStatus = parsed.status || 'ACTIVE'
+  const novoStatus = currentStatus === 'ACTIVE' ? 'PAUSED' : 'ACTIVE'
+  parsed.status = novoStatus
+  db.prepare('UPDATE campaigns_cache SET data = ?, cached_at = CURRENT_TIMESTAMP WHERE id = ?').run(JSON.stringify(parsed), id)
+  logger.info(`Status da campanha alterado: ${id}`, { userId: req.user?.id, statusAnterior: currentStatus, novoStatus })
+  res.json({ message: `Campanha ${novoStatus === 'ACTIVE' ? 'ativada' : 'pausada'} com sucesso`, campanha: { id, ...parsed } })
 }))
 
 // Função auxiliar para calcular score de performance

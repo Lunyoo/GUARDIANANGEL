@@ -1,0 +1,23 @@
+{
+  "category": "testimonial",
+  "subcategory": "resultado de uso",
+  "colors": [
+    "cinza"
+  ],
+  "features": [
+    "modelagem",
+    "conforto"
+  ],
+  "context": "demonstrar efeito modelador",
+  "confidence": 0.95,
+  "tags": [
+    "modelagem",
+    "conforto",
+    "resultado"
+  ],
+  "description": "Imagem mostrando o resultado do uso da calcinha modeladora sob um vestido cinza.",
+  "recommendedFor": [
+    "dia_a_dia",
+    "festa"
+  ]
+}

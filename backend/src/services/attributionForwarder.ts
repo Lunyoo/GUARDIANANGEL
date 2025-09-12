@@ -29,6 +29,8 @@ function sha256Lower(input?: string) {
 // Ensure optional retry columns exist; ignore errors if already present
 function ensureRetryColumns() {
   const db = getDatabase()
+  // Ensure columns that newer code relies on exist in older DBs
+  try { db.prepare(`ALTER TABLE sales_events ADD COLUMN updated_at DATETIME`).run() } catch {}
   try { db.prepare(`ALTER TABLE sales_events ADD COLUMN retry_count INTEGER DEFAULT 0`).run() } catch {}
   try { db.prepare(`ALTER TABLE sales_events ADD COLUMN last_attempt_at DATETIME`).run() } catch {}
   try { db.prepare(`ALTER TABLE sales_events ADD COLUMN last_error TEXT`).run() } catch {}

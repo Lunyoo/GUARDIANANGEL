@@ -1,0 +1,23 @@
+{
+  "category": "other",
+  "subcategory": "tabela de medidas",
+  "colors": [
+    "neutro"
+  ],
+  "features": [
+    "tabela de tamanhos",
+    "desconto"
+  ],
+  "context": "informação de tamanho e promoção",
+  "confidence": 0.95,
+  "tags": [
+    "tamanho",
+    "desconto",
+    "promoção"
+  ],
+  "description": "Imagem mostrando tabela de medidas com desconto de 50%.",
+  "recommendedFor": [
+    "informação de tamanho",
+    "promoção"
+  ]
+}

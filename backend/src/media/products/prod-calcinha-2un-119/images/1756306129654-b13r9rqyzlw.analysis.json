@@ -1,0 +1,23 @@
+{
+  "category": "testimonial",
+  "subcategory": "resultado de uso",
+  "colors": [
+    "cinza"
+  ],
+  "features": [
+    "modelagem",
+    "conforto"
+  ],
+  "context": "uso diário",
+  "confidence": 0.95,
+  "tags": [
+    "ajuste",
+    "silhueta",
+    "vestido"
+  ],
+  "description": "Pessoa usando vestido cinza ajustado mostrando o efeito modelador da calcinha.",
+  "recommendedFor": [
+    "dia_a_dia",
+    "trabalho"
+  ]
+}

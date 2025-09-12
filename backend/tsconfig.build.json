@@ -4,12 +4,7 @@
     "outDir": "./dist"
   },
   "include": [
-    "src/server.ts",
-    "src/config/**/*.ts",
-    "src/middleware/**/*.ts",
-    "src/routes/public.ts",
-  "src/services/attributionForwarder.ts",
-  "src/services/capiQueue.ts"
+    "src/**/*.ts"
   ],
   "exclude": [
     "src/controllers/**/*",

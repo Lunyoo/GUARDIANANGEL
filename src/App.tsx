@@ -1,2 +1,2 @@
-// ...replace with full application UI...
-export { default } from './App-original'
+// Export the modern Guardian Angel UI implementation
+export { default } from './App-new'

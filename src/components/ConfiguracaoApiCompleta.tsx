@@ -210,7 +210,7 @@ export default function ConfiguracaoApiCompleta() {
             </div>
             <div>
               <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Configuração de APIs - Automação Master
+                Configuração de APIs
               </h1>
               <p className="text-muted-foreground">
                 Configure todas as integrações necessárias para automação completa
@@ -221,7 +221,7 @@ export default function ConfiguracaoApiCompleta() {
           <Alert className="border-accent/50 bg-accent/10">
             <Bot className="h-4 w-4" />
             <AlertDescription>
-              <strong>Sistema de Automação Inteligente:</strong> Conecte Facebook Ads, Kiwify e Ideogram AI para automação completa do funil de marketing digital.
+              Configure integrações como Facebook Ads e Kiwify conforme necessário para sua operação.
             </AlertDescription>
           </Alert>
         </div>
@@ -483,83 +483,10 @@ export default function ConfiguracaoApiCompleta() {
           </CardContent>
         </Card>
 
-        {/* Ideogram AI Configuration */}
-        <Card className="gaming-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Bot className="h-5 w-5 text-success" />
-              Ideogram AI Integration
-            </CardTitle>
-            <CardDescription>
-              Para geração automática de criativos e imagens para campanhas
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="ideogram-token">API Key do Ideogram</Label>
-              <Input
-                id="ideogram-token"
-                type={showTokens ? "text" : "password"}
-                placeholder="VNRXO6_4G0Miln5ngDTQqQ..."
-                value={config.ideogramToken || ''}
-                onChange={(e) => setConfig(prev => ({
-                  ...prev,
-                  ideogramToken: e.target.value
-                }))}
-              />
-            </div>
-            
-            <Alert className="border-success/50 bg-success/10">
-              <CheckCircle className="h-4 w-4" />
-              <AlertDescription className="text-sm">
-                <strong>Token Pré-configurado:</strong> Seu token do Ideogram ($20 crédito) está salvo e será usado automaticamente na geração de criativos.
-              </AlertDescription>
-            </Alert>
-            
-            <div className="flex items-center justify-between pt-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => window.open('https://ideogram.ai/api/docs', '_blank')}
-              >
-                <ExternalLink className="h-4 w-4 mr-2" />
-                API Docs
-              </Button>
-              
-              <Button
-                onClick={testarIdeogram}
-                disabled={isLoading || !config.ideogramToken}
-                variant="outline"
-              >
-                {isLoading ? (
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                ) : (
-                  <Bot className="h-4 w-4 mr-2" />
-                )}
-                Testar Ideogram
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+  {/* Ideogram/Creative generator removed */}
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-center space-x-4 pt-6">
-          <Button
-            size="lg"
-            onClick={() => {
-              // Aplicar token do Ideogram automaticamente
-              setConfig(prev => ({
-                ...prev,
-                ideogramToken: 'VNRXO6_4G0Miln5ngDTQqQHwkKRwxsZmUXV1R54XMqmEN1KqB-tu6I-n0s5PiWQorIFY2ysQMI1rrRm1GnBJvg'
-              }))
-              toast.success('✅ Token do Ideogram aplicado automaticamente!')
-            }}
-            className="bg-gradient-to-r from-success to-accent hover:from-success/90 hover:to-accent/90"
-          >
-            <Bot className="h-4 w-4 mr-2" />
-            Aplicar Token Ideogram
-          </Button>
-          
+  <div className="flex items-center justify-center space-x-4 pt-6">
           <Button
             size="lg"
             onClick={testarTodasAPIs}
@@ -602,12 +529,7 @@ export default function ConfiguracaoApiCompleta() {
             
             <Separator />
             
-            <div>
-              <h4 className="font-medium text-success mb-1">3. Ideogram AI</h4>
-              <p className="text-muted-foreground">
-                Seu token já está configurado com $20 de crédito. Será usado automaticamente na geração de criativos.
-              </p>
-            </div>
+            
           </CardContent>
         </Card>
       </div>

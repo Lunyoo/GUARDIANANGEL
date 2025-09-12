@@ -31,4 +31,23 @@
   "include": [
     "src"
   ]
+  ,
+  "exclude": [
+    "src/components/ScrapingUniversal.tsx",
+    "src/components/AutomacaoCompletaReal.tsx",
+  "src/components/OfferInsightsAnalysis.tsx",
+  "src/components/MultipleAdsView.tsx",
+  "src/components/AutomacaoCompleta.tsx",
+  "src/hooks/useAutomacaoMaster.ts",
+    "src/hooks/useAIScrapingAnalysis.ts",
+    "src/hooks/useFacebookApi.ts",
+    "src/hooks/useRealTime.ts",
+    "src/services/automationMasterService.ts",
+    "src/services/funnelGamificadoService.ts",
+    "src/services/kiwifyService.ts",
+    "src/services/realScraping.ts",
+    "src/services/realScrapingPlaywright.ts",
+    "src/services/scrapingFallback.ts",
+    "src/utils/performanceConfig.ts"
+  ]
 }

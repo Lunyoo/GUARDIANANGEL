@@ -35,11 +35,12 @@ router.post('/automation/choose-offer', async (req: any, res) => {
       return res.status(400).json({ error: 'Oferta e nicho são obrigatórios' })
     }
     const db = getDatabase()
-    const info = db.prepare(`
-      INSERT INTO automation_logs (user_id, action, status, data)
-      VALUES (?, ?, ?, ?)
-    `).run(userId || null, 'choose_offer', 'completed', JSON.stringify({ oferta, investimento, nicho, tipoNicho }))
-    return res.json({ status: 'success', id: info.lastInsertRowid })
+    // Log removido - tabela automation_logs não existe mais
+    // const info = db.prepare(`
+    //   INSERT INTO automation_logs (user_id, action, status, data)
+    //   VALUES (?, ?, ?, ?)
+    // `).run(userId || null, 'choose_offer', 'completed', JSON.stringify({ oferta, investimento, nicho, tipoNicho }))
+    return res.json({ status: 'success', message: 'Oferta escolhida salva' })
   } catch (error: any) {
     logger.error('public.automation.choose-offer failed:', error)
     return res.status(500).json({ error: 'Erro ao salvar oferta escolhida', details: error.message })
@@ -739,12 +740,12 @@ router.post('/scheduler/optimize-budgets', async (req: any, res) => {
         logger.error('Failed to apply change for adset ' + adsetId + ':', err.response?.data || err.message)
       }
 
-      // Log decision
-      try {
-        const db = getDatabase()
-        db.prepare(`INSERT INTO automation_logs (user_id, action, status, data) VALUES (?, ?, ?, ?)`)
-          .run(null, 'optimize_adset', 'completed', JSON.stringify({ adsetId, spend, purchases, purchaseValue, roas, decision: action, dailyBudget }))
-      } catch {}
+      // Log removido - tabela automation_logs não existe mais
+      // try {
+      //   const db = getDatabase()
+      //   db.prepare(`INSERT INTO automation_logs (user_id, action, status, data) VALUES (?, ?, ?, ?)`)
+      //     .run(null, 'optimize_adset', 'completed', JSON.stringify({ adsetId, spend, purchases, purchaseValue, roas, decision: action, dailyBudget }))
+      // } catch {}
     }
 
     return res.json({ status: 'success', reviewed: adsets.length, changes })

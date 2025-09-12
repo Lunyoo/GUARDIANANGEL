@@ -1,0 +1,24 @@
+{
+  "category": "testimonial",
+  "subcategory": "resultado de uso",
+  "colors": [
+    "cinza"
+  ],
+  "features": [
+    "modelagem",
+    "ajuste"
+  ],
+  "context": "uso diário",
+  "confidence": 0.95,
+  "tags": [
+    "ajuste",
+    "modelagem",
+    "conforto"
+  ],
+  "description": "Imagem mostrando o resultado do uso da calcinha modeladora sob um vestido justo.",
+  "recommendedFor": [
+    "dia_a_dia",
+    "trabalho",
+    "festa"
+  ]
+}

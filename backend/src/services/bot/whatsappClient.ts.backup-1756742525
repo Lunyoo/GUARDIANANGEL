@@ -1,0 +1,542 @@
+// WHATSAPP CLIENT ESTABILIZADO - venom (primário) + Baileys (fallback)
+import EventEmitter from 'events'
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
+import logger from '../../config/logger.js'
+import QRCode from 'qrcode'
+import { broadcast } from './sse.js'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+// Global error handlers
+process.on('unhandledRejection', (reason: any, promise) => {
+  try {
+    const msg = typeof reason === 'object' && reason !== null && 'message' in (reason as any)
+      ? (reason as any).message
+      : String(reason)
+    logger.error('Unhandled Rejection:', msg)
+    if ((reason as any)?.stack) logger.error(String((reason as any).stack))
+  } catch {}
+})
+
+process.on('uncaughtException', (err: any) => {
+  try {
+    logger.error('Uncaught Exception:', err?.message || String(err))
+    if (err?.stack) logger.error(String(err.stack))
+  } catch {}
+})
+
+// Venom imports (primary)
+let venom: any = null
+
+// Baileys imports (fallback)
+let baileys: any = null
+
+export const waInternalEmitter = new EventEmitter()
+const emitter = new EventEmitter()
+let waClient: any = null
+let usingStack: 'venom' | 'baileys' | null = null
+let latestQr: { pngDataUrl?: string; ascii?: string; urlCode?: string; ts: number } | null = null
+let ready = false
+let isInitializing = false
+let initPromise: Promise<any> | null = null
+
+// Runtime state melhorado para estabilidade
+interface WARuntimeState {
+  consecutiveFailures: number
+  stale: boolean
+  lastReadyAt?: number
+  reinitInFlight?: Promise<void> | null
+  lastHealthCheck?: number
+  sessionStartTime?: number
+}
+
+const waRuntime: WARuntimeState = {
+  consecutiveFailures: 0,
+  stale: false,
+  lastReadyAt: undefined,
+  reinitInFlight: null,
+  lastHealthCheck: undefined,
+  sessionStartTime: undefined
+}
+
+async function initVenomPrimary() {
+  if (!venom) {
+    try {
+      venom = await import('venom-bot')
+      logger.info('✅ venom-bot carregado como primário')
+    } catch (e: any) {
+      throw new Error('venom-bot não disponível: ' + (e?.message || e))
+    }
+  }
+
+  const sessionName = 'hybrid-session'
+  const createOpts: any = {
+    session: sessionName,
+    // REMOVIDO: multidevice: true - causa instabilidade frequente
+    headless: 'new', // Melhor estabilidade que 'true'
+    logQR: false,
+    disableSpins: true,
+    disableWelcome: true,
+    browserArgs: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-gpu',
+      '--disable-features=AudioServiceOutOfProcess',
+      '--disable-background-timer-throttling',
+      '--disable-backgrounding-occluded-windows',
+      '--disable-renderer-backgrounding',
+      '--disable-features=VizDisplayCompositor'
+    ],
+    // Configurações adicionais para estabilidade
+    autoClose: 0, // Não fechar automaticamente
+    createPathFileToken: true,
+    waitForLogin: true,
+    updatesLog: false
+  }
+
+  // Cleanup de locks do Chromium
+  try {
+    const candidates = [
+      path.resolve(process.cwd(), 'tokens', sessionName),
+      path.resolve(process.cwd(), 'backend', 'tokens', sessionName)
+    ]
+    const lockNames = ['SingletonLock', 'SingletonCookie', 'SingletonSocket']
+    for (const base of candidates) {
+      try {
+        for (const name of lockNames) {
+          const p1 = path.join(base, name)
+          const p2 = path.join(base, 'Default', name)
+          try { if (fs.existsSync(p1)) { fs.rmSync(p1, { force: true }); logger.info(`[venom] Removed lock: ${p1}`) } } catch {}
+          try { if (fs.existsSync(p2)) { fs.rmSync(p2, { force: true }); logger.info(`[venom] Removed lock: ${p2}`) } } catch {}
+        }
+      } catch {}
+    }
+  } catch {}
+
+  logger.info('🚀 Iniciando venom-bot (primário)...')
+  const vClient = await (venom.create as any)(createOpts)
+
+  // Força ready após criação bem-sucedida
+  setTimeout(() => {
+    if (vClient && !ready) {
+      try {
+        if (typeof vClient.getSessionTokenBrowser === 'function' || typeof vClient.sendText === 'function') {
+          logger.info('🔥 Forçando venom ready após timeout - sessão detectada')
+          ready = true
+          isInitializing = false
+          latestQr = null
+          usingStack = 'venom'
+          waRuntime.lastReadyAt = Date.now()
+          waRuntime.consecutiveFailures = 0
+          waRuntime.stale = false
+          waRuntime.sessionStartTime = Date.now()
+          broadcast('wa_qr', { dataUrl: null, ts: Date.now() })
+          broadcast('wa_status', { ready: true, hasClient: true, ts: Date.now(), stack: 'venom' })
+          emitter.emit('ready')
+        } else {
+          logger.info('⏳ Venom conectou mas ainda carregando funções...')
+        }
+      } catch {
+        logger.info('⏳ Venom conectou mas funções não disponíveis ainda')
+      }
+    }
+  }, 3000)
+
+  // Estado de conexão melhorado
+  try {
+    vClient.onStateChange((state: string) => {
+      const s = String(state || '').toUpperCase()
+      logger.info(`[venom] state: ${s}`)
+      
+      if (s.includes('CONNECTED') && vClient) {
+        try {
+          if (typeof vClient.getSessionTokenBrowser === 'function' || typeof vClient.sendText === 'function') {
+            ready = true
+            isInitializing = false
+            latestQr = null
+            usingStack = 'venom'
+            waRuntime.lastReadyAt = Date.now()
+            waRuntime.consecutiveFailures = 0
+            waRuntime.stale = false
+            if (!waRuntime.sessionStartTime) waRuntime.sessionStartTime = Date.now()
+            broadcast('wa_qr', { dataUrl: null, ts: Date.now() })
+            broadcast('wa_status', { ready: true, hasClient: true, ts: Date.now(), stack: 'venom' })
+            emitter.emit('ready')
+            logger.info('✅ Venom conectado com funções disponíveis')
+          }
+        } catch {
+          logger.warn('⚠️ Venom state CONNECTED mas funções não disponíveis')
+        }
+      } else if (s.includes('PAIRING') || s.includes('OPENING') || s.includes('SYNCING') || s.includes('TIMEOUT')) {
+        ready = false
+        broadcast('wa_status', { ready: false, hasClient: true, status: 'connecting', ts: Date.now(), stack: 'venom' })
+      } else if (s.includes('UNPAIRED') || s.includes('UNLAUNCHED') || s.includes('CONFLICT')) {
+        ready = false
+        waRuntime.stale = true
+        broadcast('wa_status', { ready: false, hasClient: !!vClient, status: 'disconnected', reason: state, ts: Date.now(), stack: 'venom' })
+        logger.warn(`🔄 Venom desconectado: ${state}`)
+      }
+      
+      // Se volta para QR depois de conectado, reiniciar
+      if ((s.includes('QR') || s.includes('SCAN')) && ready && usingStack === 'venom') {
+        logger.warn('🔄 Venom voltou para QR mode - sessão perdida, reiniciando...')
+        ready = false
+        waRuntime.stale = true
+        setTimeout(() => {
+          safeReinit('session_lost').catch(() => {})
+        }, 2000)
+      }
+    })
+  } catch {}
+
+  // Mensagens recebidas
+  try {
+    vClient.onMessage(async (message: any) => {
+      if (message.fromMe) return
+      try {
+        if (!ready) {
+          ready = true
+          usingStack = 'venom'
+          isInitializing = false
+          waRuntime.lastReadyAt = Date.now()
+          waRuntime.consecutiveFailures = 0
+          waRuntime.stale = false
+          if (!waRuntime.sessionStartTime) waRuntime.sessionStartTime = Date.now()
+          try { broadcast('wa_status', { ready: true, hasClient: true, ts: Date.now(), stack: 'venom', via: 'onMessage' }) } catch {}
+        }
+        const rawFrom = message.from || ''
+        const phone = rawFrom.replace(/@c\.us$|@s\.whatsapp\.net$/,'')
+        const body = String(message.body || '')
+        const msgData = {
+          id: message.id || Math.random().toString(36).slice(2),
+          phone,
+          body,
+          direction: 'IN' as const,
+          at: new Date().toISOString(),
+          source: 'venom'
+        }
+        logger.info(`📩 Mensagem venom recebida: ${msgData.phone} -> "${msgData.body}"`)
+        emitter.emit('message', message)
+        waInternalEmitter.emit('inbound-wa', msgData)
+      } catch (err: any) {
+        logger.warn('Erro ao processar mensagem (venom): ' + (err?.message || String(err)))
+      }
+    })
+  } catch {}
+
+  // Monitor de saúde MENOS agressivo
+  const healthCheck = setInterval(async () => {
+    if (usingStack === 'venom' && vClient && ready) {
+      try {
+        const now = Date.now()
+        const timeSinceLastReady = waRuntime.lastReadyAt ? now - waRuntime.lastReadyAt : 0
+        const timeSinceLastCheck = waRuntime.lastHealthCheck ? now - waRuntime.lastHealthCheck : 0
+        
+        // Só faz health check se passou mais de 5 minutos desde o último ready
+        // e mais de 2 minutos desde o último check
+        if (timeSinceLastReady > 300000 && timeSinceLastCheck > 120000) {
+          waRuntime.lastHealthCheck = now
+          const state = await vClient.getConnectionState?.()
+          if (state && (state.includes('DISCONNECTED') || state.includes('UNPAIRED'))) {
+            logger.warn('💔 Venom session health check failed - desconectado')
+            ready = false
+            waRuntime.stale = true
+            broadcast('wa_status', { ready: false, hasClient: false, ts: Date.now(), reason: 'health_check_failed' })
+            clearInterval(healthCheck)
+            setTimeout(() => {
+              safeReinit('health_check_failed').catch(() => {})
+            }, 5000) // Espera mais tempo
+          }
+        }
+      } catch {
+        // Se não conseguir verificar, assume que está OK
+      }
+    } else if (!ready || usingStack !== 'venom') {
+      clearInterval(healthCheck)
+    }
+  }, 60000) // Verifica a cada 1 minuto
+
+  usingStack = 'venom'
+  return vClient
+}
+
+async function initBaileysFallback() {
+  if (!baileys) {
+    try {
+      baileys = await import('@adiwajshing/baileys')
+      logger.info('✅ Baileys carregado como fallback')
+    } catch (e: any) {
+      throw new Error('Baileys não disponível: ' + (e?.message || e))
+    }
+  }
+
+  const sessionName = 'hybrid-session'
+  const sessionPath = path.resolve(process.cwd(), 'tokens', 'hybrid-session', 'auth_info.json')
+  const sessionDir = path.dirname(sessionPath)
+
+  // Criar diretório se não existir
+  if (!fs.existsSync(sessionDir)) {
+    fs.mkdirSync(sessionDir, { recursive: true })
+  }
+
+  // Carregar sessão existente se disponível
+  let authState: any = { state: { creds: {}, keys: { get: () => {}, set: () => {} } }, saveCreds: () => {} }
+  try {
+    if (fs.existsSync(sessionPath)) {
+      const sessionData = JSON.parse(fs.readFileSync(sessionPath, 'utf-8'))
+      authState = {
+        state: {
+          creds: sessionData.creds || {},
+          keys: {
+            get: (type: any, ids: any) => {
+              const data = sessionData.keys?.[type] || {}
+              return ids.map((id: any) => data[id])
+            },
+            set: (data: any) => {
+              if (!sessionData.keys) sessionData.keys = {}
+              Object.assign(sessionData.keys, data)
+              fs.writeFileSync(sessionPath, JSON.stringify(sessionData, null, 2))
+            }
+          }
+        },
+        saveCreds: () => {
+          fs.writeFileSync(sessionPath, JSON.stringify(sessionData, null, 2))
+        }
+      }
+      logger.info('📂 Sessão Baileys carregada do arquivo')
+    }
+  } catch (e: any) {
+    logger.warn('⚠️ Erro ao carregar sessão Baileys: ' + (e?.message || e))
+  }
+
+  const socket = baileys.makeWASocket({
+    auth: authState,
+    printQRInTerminal: false,
+    logger: baileys.Pino({ level: 'silent' }),
+    browser: baileys.Browsers.macOS('Desktop'),
+    syncFullHistory: false
+  })
+
+  // Eventos Baileys
+  socket.ev.on('connection.update', (update: any) => {
+    const { connection, lastDisconnect, qr } = update
+    logger.info(`[baileys] connection: ${connection}`)
+
+    if (qr && !ready) {
+      latestQr = qr
+      broadcast('wa_qr', { dataUrl: qr, ts: Date.now() })
+      logger.info('📱 QR Baileys gerado')
+    }
+
+    if (connection === 'close') {
+      const shouldReconnect = (lastDisconnect?.error as any)?.output?.statusCode !== baileys.DisconnectReason.loggedOut
+      if (shouldReconnect) {
+        logger.info('🔄 Baileys desconectado, tentando reconectar...')
+        setTimeout(() => {
+          safeReinit('baileys_reconnect').catch(() => {})
+        }, 5000)
+      } else {
+        logger.warn('🚪 Baileys desconectado permanentemente (logged out)')
+        ready = false
+        waRuntime.stale = true
+        broadcast('wa_status', { ready: false, hasClient: false, ts: Date.now(), reason: 'logged_out', stack: 'baileys' })
+      }
+    } else if (connection === 'open') {
+      ready = true
+      isInitializing = false
+      latestQr = null
+      usingStack = 'baileys'
+      waRuntime.lastReadyAt = Date.now()
+      waRuntime.consecutiveFailures = 0
+      waRuntime.stale = false
+      if (!waRuntime.sessionStartTime) waRuntime.sessionStartTime = Date.now()
+      broadcast('wa_qr', { dataUrl: null, ts: Date.now() })
+      broadcast('wa_status', { ready: true, hasClient: true, ts: Date.now(), stack: 'baileys' })
+      emitter.emit('ready')
+      logger.info('✅ Baileys conectado')
+    }
+  })
+
+  socket.ev.on('creds.update', authState.saveCreds)
+
+  socket.ev.on('messages.upsert', async ({ messages }: any) => {
+    for (const msg of messages) {
+      if (msg.key.fromMe) continue
+      try {
+        if (!ready) {
+          ready = true
+          usingStack = 'baileys'
+          isInitializing = false
+          waRuntime.lastReadyAt = Date.now()
+          waRuntime.consecutiveFailures = 0
+          waRuntime.stale = false
+          if (!waRuntime.sessionStartTime) waRuntime.sessionStartTime = Date.now()
+          try { broadcast('wa_status', { ready: true, hasClient: true, ts: Date.now(), stack: 'baileys' }) } catch {}
+        }
+        const phone = msg.key.remoteJid?.replace(/@s\.whatsapp\.net$/, '') || ''
+        const body = msg.message?.conversation || msg.message?.extendedTextMessage?.text || ''
+        const msgData = {
+          id: msg.key.id,
+          phone,
+          body,
+          direction: 'IN' as const,
+          at: new Date().toISOString(),
+          source: 'baileys'
+        }
+        logger.info(`📩 Mensagem Baileys recebida: ${msgData.phone} -> "${msgData.body}"`)
+        emitter.emit('message', msg)
+        waInternalEmitter.emit('inbound-wa', msgData)
+      } catch (err: any) {
+        logger.warn('Erro ao processar mensagem (baileys): ' + (err?.message || String(err)))
+      }
+    }
+  })
+
+  usingStack = 'baileys'
+  return socket
+}
+
+async function safeReinit(reason: string = 'unknown') {
+  if (isInitializing) {
+    logger.info(`⏳ Já inicializando, ignorando reinit: ${reason}`)
+    return
+  }
+
+  isInitializing = true
+  waRuntime.consecutiveFailures++
+  logger.warn(`🔄 Reiniciando WhatsApp client (${reason}) - tentativa ${waRuntime.consecutiveFailures}`)
+
+  // Limpar estado anterior
+  ready = false
+  latestQr = null
+  usingStack = null
+  waRuntime.stale = true
+
+  try {
+    broadcast('wa_status', { ready: false, hasClient: false, ts: Date.now(), reason, reinitializing: true })
+  } catch {}
+
+  // Aguardar um pouco antes de reiniciar
+  const delay = Math.min(waRuntime.consecutiveFailures * 2000, 10000) // Máximo 10s
+  await new Promise(resolve => setTimeout(resolve, delay))
+
+  try {
+    // Tentar venom primeiro
+    if (venom) {
+      logger.info('🚀 Tentando reiniciar com venom...')
+      const vClient = await initVenomPrimary()
+      if (vClient) {
+        logger.info('✅ Venom reiniciado com sucesso')
+        isInitializing = false
+        return vClient
+      }
+    }
+  } catch (e: any) {
+    logger.warn('❌ Falha ao reiniciar venom: ' + (e?.message || e))
+  }
+
+  try {
+    // Fallback para Baileys
+    if (baileys) {
+      logger.info('🚀 Tentando reiniciar com Baileys...')
+      const bClient = await initBaileysFallback()
+      if (bClient) {
+        logger.info('✅ Baileys reiniciado com sucesso')
+        isInitializing = false
+        return bClient
+      }
+    }
+  } catch (e: any) {
+    logger.warn('❌ Falha ao reiniciar Baileys: ' + (e?.message || e))
+  }
+
+  // Se chegou aqui, ambas falharam
+  logger.error('💥 Falha crítica: ambas as stacks falharam ao reiniciar')
+  isInitializing = false
+  waRuntime.consecutiveFailures++
+
+  // Agendar nova tentativa se não excedeu limite
+  if (waRuntime.consecutiveFailures < 5) {
+    setTimeout(() => {
+      safeReinit('retry_after_failure').catch(() => {})
+    }, 30000) // Tentar novamente em 30s
+  } else {
+    logger.error('🚫 Limite de tentativas excedido, aguardando intervenção manual')
+    broadcast('wa_status', { ready: false, hasClient: false, ts: Date.now(), reason: 'max_retries_exceeded', critical: true })
+  }
+
+  throw new Error('Ambas as stacks falharam ao reiniciar')
+}
+
+async function forceBaileysFallback() {
+  logger.info('🔄 Forçando fallback para Baileys...')
+  
+  // Limpar estado venom
+  ready = false
+  latestQr = null
+  usingStack = null
+  waRuntime.stale = true
+  
+  try {
+    broadcast('wa_status', { ready: false, hasClient: false, ts: Date.now(), reason: 'forcing_baileys', stack: 'baileys' })
+  } catch {}
+  
+  try {
+    const bClient = await initBaileysFallback()
+    if (bClient) {
+      logger.info('✅ Baileys forçado com sucesso')
+      return bClient
+    }
+  } catch (e: any) {
+    logger.error('❌ Falha ao forçar Baileys: ' + (e?.message || e))
+    throw e
+  }
+}
+
+async function init() {
+  if (isInitializing) {
+    logger.info('⏳ Já inicializando, aguardando...')
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        reject(new Error('Timeout aguardando inicialização'))
+      }, 30000)
+      
+      const checkReady = () => {
+        if (!isInitializing) {
+          clearTimeout(timeout)
+          resolve(waClient)
+        } else {
+          setTimeout(checkReady, 1000)
+        }
+      }
+      checkReady()
+    })
+  }
+
+  isInitializing = true
+  logger.info('🚀 Iniciando WhatsApp client híbrido...')
+  
+  try {
+    // Tentar venom primeiro (mais estável com as configurações ajustadas)
+    logger.info('🔥 Tentando venom como primário...')
+    waClient = await initVenomPrimary()
+    logger.info('✅ Venom inicializado com sucesso')
+  } catch (e: any) {
+    logger.warn('⚠️ Venom falhou, tentando Baileys: ' + (e?.message || e))
+    try {
+      waClient = await initBaileysFallback()
+      logger.info('✅ Baileys inicializado como fallback')
+    } catch (e2: any) {
+      logger.error('❌ Ambas as stacks falharam: venom=' + (e?.message || e) + ', baileys=' + (e2?.message || e2))
+      isInitializing = false
+      throw new Error('Falha crítica: ambas as stacks falharam ao inicializar')
+    }
+  }
+
+  isInitializing = false
+  return waClient
+}
