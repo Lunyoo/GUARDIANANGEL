@@ -44,6 +44,8 @@ backend/tokens/
 # ML data and cache
 backend/data/
 backend/tmp/
+backend/data/*.json
+*.json
 
 # Build outputs
 build/

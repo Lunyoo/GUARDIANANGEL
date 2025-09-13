@@ -10,6 +10,186 @@ import { autoOptimizer } from '../ml/autoOptimizer.js'
 
 const prisma = new PrismaClient()
 
+// 💾 CACHE DE PREÇOS POR CONVERSA (evita contradições de preço)
+const conversationPrices = new Map<string, {
+  quantity: number
+  price: number
+  originalPrice: number
+  timestamp: number
+}>()
+
+// Limpar cache antigo (mais de 2 horas)
+setInterval(() => {
+  const now = Date.now()
+  for (const [phone, data] of conversationPrices.entries()) {
+    if (now - data.timestamp > 2 * 60 * 60 * 1000) { // 2 horas
+      conversationPrices.delete(phone)
+      console.log(`🗑️ Cache de preço removido para ${phone} (expirado)`)
+    }
+  }
+}, 30 * 60 * 1000) // Verificar a cada 30 minutos
+
+/**
+ * 💰 Extrair e cachear preços das respostas do bot
+ */
+function extractAndCachePriceFromResponse(response: string, phone: string) {
+  // Buscar padrões como "2 unidades por R$ 119,90" ou "duas por R$ 147,00"
+  const pricePatterns = [
+    /(?:(\d+)|duas|dois|três|quatro|seis)\s*(?:unidade|calcinha|peça)s?\s*(?:por|custa|fica|sai)\s*R\$\s*(\d{1,3}(?:,\d{2})?)/gi,
+    /R\$\s*(\d{1,3}(?:,\d{2})?)\s*(?:por|para)\s*(?:(\d+)|duas|dois|três|quatro|seis)/gi
+  ]
+  
+  for (const pattern of pricePatterns) {
+    const match = pattern.exec(response)
+    if (match) {
+      const quantityStr = match[1] || match[2]
+      const priceStr = match[2] || match[1]
+      
+      // Converter quantidade textual para número
+      let quantity = parseInt(quantityStr) || 0
+      if (!quantity) {
+        const textToNumber: Record<string, number> = {
+          'duas': 2, 'dois': 2, 'três': 3, 'quatro': 4, 'seis': 6
+        }
+        quantity = textToNumber[quantityStr?.toLowerCase()] || 0
+      }
+      
+      if (quantity > 0 && priceStr) {
+        const price = parseFloat(priceStr.replace(',', '.'))
+        if (price > 0) {
+          // Cachear este preço para a conversa
+          conversationPrices.set(phone, {
+            quantity,
+            price,
+            originalPrice: price, // Assumir que é o preço original por enquanto
+            timestamp: Date.now()
+          })
+          
+          console.log(`💾 PREÇO EXTRAÍDO E CACHEADO: ${quantity}x = R$ ${price.toFixed(2).replace('.', ',')} para ${phone}`)
+          return { quantity, price }
+        }
+      }
+    }
+  }
+  
+  return null
+}
+
+import fs from 'fs'
+import path from 'path'
+
+// 🚨 Verificar modo de manutenção antes de enviar mensagens
+function isMaintenanceMode(): boolean {
+  try {
+    const maintenanceFile = path.join(__dirname, '../../../MAINTENANCE_MODE')
+    if (fs.existsSync(maintenanceFile)) {
+      const content = fs.readFileSync(maintenanceFile, 'utf8')
+      return content.includes('MAINTENANCE_ACTIVE=true')
+    }
+    return false
+  } catch (error) {
+    console.error('Erro ao verificar modo de manutenção:', error)
+    return false
+  }
+}
+
+/**
+ * 🚨 VALIDAÇÃO CRÍTICA DE PREÇOS - Remove preços inventados pelo GPT
+ */
+function validateResponsePricing(botResponse: string, authorizedPrice: string = '', phone: string = ''): string {
+  try {
+    console.log(`🔍 VALIDANDO PREÇOS NA RESPOSTA: "${botResponse}"`)
+    console.log(`🔍 PREÇO AUTORIZADO: ${authorizedPrice}`)
+    
+    // 🚨 TABELA OFICIAL DE PREÇOS (ÚNICA FONTE VERDADEIRA)
+    const OFFICIAL_PRICES = [
+      'R$ 89,90', 'R$ 97,00',           // 1 unidade
+      'R$ 119,90', 'R$ 129,90', 'R$ 139,90', 'R$ 147,00',  // 2 unidades
+      'R$ 159,90', 'R$ 169,90', 'R$ 179,90', 'R$ 187,00',  // 3 unidades
+      'R$ 239,90',                      // 4 unidades
+      'R$ 359,90'                       // 6 unidades
+    ]
+    
+    // 💰 VERIFICAR PREÇO CACHED PARA ESTA CONVERSA
+    const cachedPrice = conversationPrices.get(phone)
+    let conversationAuthorizedPrices: string[] = []
+    
+    if (cachedPrice) {
+      const formattedPrice = `R$ ${cachedPrice.price.toFixed(2).replace('.', ',')}`
+      conversationAuthorizedPrices = [formattedPrice]
+      console.log(`💾 PREÇO CACHED AUTORIZADO PARA CONVERSA: ${formattedPrice}`)
+    } else {
+      conversationAuthorizedPrices = OFFICIAL_PRICES
+    }
+    
+    // Detectar todos os preços na mensagem
+    const priceRegex = /R\$\s*\d{1,3}(?:,\d{2})?/gi
+    const foundPrices = botResponse.match(priceRegex) || []
+    
+    console.log(`🔍 PREÇOS ENCONTRADOS: ${foundPrices.join(', ')}`)
+    
+    let validatedResponse = botResponse
+    let hasInvalidPrice = false
+    
+    // Verificar cada preço encontrado
+    for (const price of foundPrices) {
+      const normalizedPrice = price.replace(/\s+/g, ' ')
+      
+      // Se tem preço cached, só aceitar esse preço
+      const allowedPrices = cachedPrice ? conversationAuthorizedPrices : OFFICIAL_PRICES
+      
+      if (!allowedPrices.includes(normalizedPrice)) {
+        console.error(`❌ PREÇO INVÁLIDO DETECTADO: ${normalizedPrice}`)
+        console.error(`📋 PREÇOS PERMITIDOS: ${allowedPrices.join(', ')}`)
+        hasInvalidPrice = true
+        
+        // Substituir preço inválido pelo autorizado ou cached
+        const safePrice = cachedPrice ? 
+          `R$ ${cachedPrice.price.toFixed(2).replace('.', ',')}` : 
+          (authorizedPrice || 'consultar valores atualizados')
+        validatedResponse = validatedResponse.replace(price, safePrice)
+        console.log(`🔄 SUBSTITUÍDO: ${price} → ${safePrice}`)
+      } else {
+        console.log(`✅ PREÇO VÁLIDO: ${normalizedPrice}`)
+      }
+    }
+    
+    // 🚨 DETECTAR COMBINAÇÕES PROIBIDAS ESPECÍFICAS
+    const forbiddenCombinations = [
+      /(?:três|3)\s*(?:por|unidade|calcinha|unidades).*?R\$\s*89,90/i,  // 3 por R$ 89,90
+      /(?:duas|2)\s*(?:por|unidade|calcinha|unidades).*?R\$\s*89,90/i,  // 2 por R$ 89,90
+      /(?:três|3)\s*(?:por|unidade|calcinha|unidades).*?R\$\s*97,00/i,  // 3 por R$ 97,00
+      /(?:duas|2)\s*(?:por|unidade|calcinha|unidades).*?R\$\s*97,00/i,  // 2 por R$ 97,00
+      /(?:cinco|5)\s*(?:por|unidade|calcinha|unidades)/i,               // 5 unidades (não existe)
+      /(?:sete|7)\s*(?:por|unidade|calcinha|unidades)/i,                // 7 unidades (não existe)
+    ]
+    
+    for (const forbidden of forbiddenCombinations) {
+      if (forbidden.test(validatedResponse)) {
+        console.error(`❌ COMBINAÇÃO PROIBIDA DETECTADA: ${forbidden}`)
+        hasInvalidPrice = true
+        
+        // Substituir por mensagem segura
+        validatedResponse = 'Vou consultar os valores atualizados para você! Qual quantidade você tem interesse? Temos opções de 1, 2 ou 3 unidades.'
+        console.log(`🔄 RESPOSTA SUBSTITUÍDA POR SEGURANÇA`)
+        break
+      }
+    }
+    
+    if (hasInvalidPrice) {
+      console.error(`🚨 PREÇOS INVÁLIDOS CORRIGIDOS NA RESPOSTA!`)
+      console.error(`📋 RESPOSTA ORIGINAL: "${botResponse}"`)
+      console.error(`📋 RESPOSTA CORRIGIDA: "${validatedResponse}"`)
+    }
+    
+    return validatedResponse
+    
+  } catch (error) {
+    console.error(`❌ Erro na validação de preços:`, error)
+    return botResponse // Retorna original se der erro
+  }
+}
+
 // 🛡️ SISTEMA ANTI-DUPLICAÇÃO ROBUSTO
 const processedMessages = new Map<string, number>()
 const DEDUPLICATION_WINDOW = 15000 // 15 segundos
@@ -331,18 +511,32 @@ export async function processInbound(
     // ⏱️ TIMING HUMANO OBRIGATÓRIO
     const typingTime = calculateTypingTime(finalResponse)
     console.log(`⏱️ Simulando digitação: ${typingTime}ms`)
-    
+
     await new Promise(resolve => setTimeout(resolve, typingTime))
-    
-    // 📤 ENVIAR RESPOSTA
-    console.log(`🔍 DEBUG ANTES DO ENVIO - finalResponse: "${finalResponse}"`)
-    console.log(`🔍 DEBUG ANTES DO ENVIO - length: ${finalResponse?.length || 0}`)
-    console.log(`🔍 DEBUG ANTES DO ENVIO - type: ${typeof finalResponse}`)
-    
-    await sendWhatsAppMessage(cleanPhone, finalResponse)
-    console.log(`✅ Resposta enviada para ${cleanPhone}`)
-    
-    // 📊 COLETA DE DADOS (Executar após envio para não atrasar)
+
+    // 🚨 VALIDAÇÃO CRÍTICA DE PREÇOS ANTES DO ENVIO
+    console.log(`🔍 DEBUG ANTES DA VALIDAÇÃO - finalResponse: "${finalResponse}"`)
+    const validatedResponse = validateResponsePricing(finalResponse, '', cleanPhone)
+    console.log(`🔍 DEBUG APÓS VALIDAÇÃO - validatedResponse: "${validatedResponse}"`)
+
+    // � EXTRAIR E CACHEAR PREÇOS DA RESPOSTA PARA MANTER CONSISTÊNCIA
+    extractAndCachePriceFromResponse(validatedResponse, cleanPhone)
+
+    // �📤 ENVIAR RESPOSTA VALIDADA
+    console.log(`🔍 DEBUG ANTES DO ENVIO - finalResponse: "${validatedResponse}"`)
+    console.log(`🔍 DEBUG ANTES DO ENVIO - length: ${validatedResponse?.length || 0}`)
+    console.log(`🔍 DEBUG ANTES DO ENVIO - type: ${typeof validatedResponse}`)
+
+    // 🚨 VERIFICAR MODO DE MANUTENÇÃO
+    if (isMaintenanceMode()) {
+      console.log('🚨 MODO DE MANUTENÇÃO ATIVO - Mensagem NÃO será enviada')
+      console.log('📝 Mensagem que seria enviada:', validatedResponse)
+      console.log('✅ Processamento concluído (sem envio)')
+      return
+    }
+
+    await sendWhatsAppMessage(cleanPhone, validatedResponse)
+    console.log(`✅ Resposta enviada para ${cleanPhone}`)    // 📊 COLETA DE DADOS (Executar após envio para não atrasar)
     setTimeout(async () => {
       try {
         // Obter histórico da conversa (seria necessário implementar)

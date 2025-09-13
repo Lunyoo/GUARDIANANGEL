@@ -83,12 +83,12 @@
     {
       "campaignId": "whatsapp_bot",
       "name": "whatsapp_bot",
-      "totalSpent": 96.5,
-      "totalLeads": 193,
+      "totalSpent": 100,
+      "totalLeads": 200,
       "roas": 0,
       "active": true,
       "budget": 0,
-      "lastUpdated": 1757694244477
+      "lastUpdated": 1757791466738
     }
   ],
   "decisions": [

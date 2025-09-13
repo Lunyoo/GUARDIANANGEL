@@ -57,6 +57,14 @@
       "status": "waiting"
     },
     {
+      "leadId": "85cf5d1f-ceea-4b8d-b0ca-a19a7b8e9181",
+      "segment": "A-alto",
+      "score": 86.47,
+      "priority": 104.79566434295627,
+      "enqueuedAt": 1757695559585,
+      "status": "waiting"
+    },
+    {
       "leadId": "3edbb84a-8042-473c-bce2-2efb755eef07",
       "segment": "A-alto",
       "score": 87.63,
@@ -286,6 +294,14 @@
       "score": 97.4,
       "priority": 104.00808154804697,
       "enqueuedAt": 1756158531699,
+      "status": "waiting"
+    },
+    {
+      "leadId": "d15c701e-06d5-4e39-b2fd-4d1ce93494e8",
+      "segment": "A-alto",
+      "score": 87.34,
+      "priority": 103.99910921854216,
+      "enqueuedAt": 1757702296420,
       "status": "waiting"
     },
     {
@@ -590,6 +606,14 @@
       "score": 88.64,
       "priority": 103.09808274314885,
       "enqueuedAt": 1757643293220,
+      "status": "waiting"
+    },
+    {
+      "leadId": "51939292-040b-4671-b7b7-4c3349c7d90a",
+      "segment": "A-alto",
+      "score": 86.47,
+      "priority": 103.09755351145789,
+      "enqueuedAt": 1757695246791,
       "status": "waiting"
     },
     {
@@ -1174,6 +1198,14 @@
       "score": 85.8,
       "priority": 101.0927808050688,
       "enqueuedAt": 1757600988015,
+      "status": "waiting"
+    },
+    {
+      "leadId": "9fe7bb6b-133e-4ab8-b53a-8ad43c27e6d1",
+      "segment": "A-alto",
+      "score": 89.33,
+      "priority": 101.08250486762574,
+      "enqueuedAt": 1757789805193,
       "status": "waiting"
     },
     {

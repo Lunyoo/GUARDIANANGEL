@@ -39,7 +39,8 @@ function extractRequestedQuantity(message: string): number | undefined {
     const match = lowerMessage.match(pattern)
     if (match) {
       const qty = parseInt(match[1])
-      if (qty >= 1 && qty <= 6) {
+      // ✅ CORREÇÃO: Validação NaN adicionada
+      if (!isNaN(qty) && qty >= 1 && qty <= 6) {
         return qty
       }
     }
@@ -48,6 +49,19 @@ function extractRequestedQuantity(message: string): number | undefined {
   return undefined
 }
 const db = getDatabase()
+
+// ✅ FUNÇÃO DE SANITIZAÇÃO PARA EVITAR INJECTION
+function sanitizeUserInput(input: string): string {
+  if (!input || typeof input !== 'string') return ''
+  
+  return input
+    .replace(/[<>]/g, '') // Remove tags HTML
+    .replace(/javascript:/gi, '') // Remove JS
+    .replace(/data:/gi, '') // Remove data URLs
+    .replace(/vbscript:/gi, '') // Remove VBScript
+    .trim()
+    .slice(0, 2000) // Limita tamanho máximo
+}
 
 // 💾 Funções para persistir conversas no banco SQLite
 function ensureConversationExists(phone: string): string {
@@ -697,7 +711,26 @@ import { AdminReportingSystem } from './adminSystem.js'
 const activeConversations = new Map<string, ConversationMessage[]>()
 const customerStates = new Map<string, 'exploring' | 'interested' | 'buying' | 'completed'>()
 
-// 🛡️ SISTEMA ANTI-DUPLICAÇÃO E DEBOUNCE MELHORADO
+// � CACHE DE PREÇOS POR CONVERSA (evita contradições de preço)
+const conversationPrices = new Map<string, {
+  quantity: number
+  price: number
+  originalPrice: number
+  timestamp: number
+}>()
+
+// Limpar cache antigo (mais de 2 horas)
+setInterval(() => {
+  const now = Date.now()
+  for (const [phone, data] of conversationPrices.entries()) {
+    if (now - data.timestamp > 2 * 60 * 60 * 1000) { // 2 horas
+      conversationPrices.delete(phone)
+      console.log(`🗑️ Cache de preço removido para ${phone} (expirado)`)
+    }
+  }
+}, 30 * 60 * 1000) // Verificar a cada 30 minutos
+
+// �🛡️ SISTEMA ANTI-DUPLICAÇÃO E DEBOUNCE MELHORADO
 const messageBuffers = new Map<string, {
   messages: string[]
   lastActivity: number
@@ -798,14 +831,40 @@ function buildMLIntegratedPrompt(pricingArm?: any, approachArm?: any, timingArm?
   let mainPrice = 'R$ 89,90'
   let quantity = 1
   
+  // 🚨 TABELA OFICIAL DE PREÇOS (ÚNICA FONTE VERDADEIRA)
+  const OFFICIAL_PRICES = {
+    1: ['R$ 89,90', 'R$ 97,00'],
+    2: ['R$ 119,90', 'R$ 129,90', 'R$ 139,90', 'R$ 147,00'],
+    3: ['R$ 159,90', 'R$ 169,90', 'R$ 179,90', 'R$ 187,00'],
+    4: ['R$ 239,90'],
+    6: ['R$ 359,90']
+  }
+  
   if (pricingArm?.context) {
     const strategy = pricingArm.context
-    // Formatar preço corretamente
-    const rawPrice = strategy.price || 89.9
-    mainPrice = typeof rawPrice === 'number' ? 
-      `R$ ${rawPrice.toFixed(2).replace('.', ',')}` : 
-      rawPrice
     quantity = strategy.qty || 1
+    
+    // 🚨 VALIDAÇÃO CRÍTICA: Verificar se quantidade e preço são válidos
+    const validPricesForQty = OFFICIAL_PRICES[quantity as keyof typeof OFFICIAL_PRICES]
+    if (!validPricesForQty) {
+      console.error(`❌ QUANTIDADE INVÁLIDA: ${quantity} - usando padrão 1 unidade`)
+      quantity = 1
+      mainPrice = 'R$ 89,90'
+    } else {
+      // Formatar preço corretamente
+      const rawPrice = strategy.price || 89.9
+      const formattedPrice = typeof rawPrice === 'number' ? 
+        `R$ ${rawPrice.toFixed(2).replace('.', ',')}` : 
+        rawPrice
+      
+      // 🚨 VERIFICAÇÃO FINAL: Preço deve estar na lista oficial
+      if (validPricesForQty.includes(formattedPrice)) {
+        mainPrice = formattedPrice
+      } else {
+        console.error(`❌ PREÇO INVÁLIDO: ${formattedPrice} para quantidade ${quantity} - usando primeiro da lista`)
+        mainPrice = validPricesForQty[0]
+      }
+    }
     
     // VERIFICAR se a quantidade do arm corresponde à quantidade solicitada
     if (quantity !== strategy.qty) {
@@ -867,10 +926,33 @@ PARE IMEDIATAMENTE se o cliente disser:
 RESPOSTA PARA ENCERRAR: "Tudo bem! Obrigada pelo seu tempo. Se mudar de ideia, estarei aqui! 😊✨"
 
 🛡️ REGRAS CRÍTICAS DE PREÇOS:
-- JAMAIS inventar preços diferentes
-- USAR APENAS o preço: ${mainPrice}
+- JAMAIS inventar preços diferentes da tabela oficial
+- USAR APENAS o preço selecionado: ${mainPrice} para ${quantity} unidade${quantity > 1 ? 's' : ''}
 - Se cliente questiona preço: explicar VALOR/BENEFÍCIOS, nunca baixar
 - NUNCA oferecer desconto sem autorização do sistema
+- JAMAIS misturar quantidades com preços de outras quantidades
+
+� ESTRATÉGIAS COMERCIAIS INTELIGENTES:
+
+📈 UPSELL (se cliente pergunta MENOS depois de ver oferta maior):
+Exemplo: Cliente viu 2 unidades, agora pergunta preço de 1:
+"Ah, uma sozinha sai R$ 89,90, mas duas por R$ 119,90 é MUITO mais vantajoso! É praticamente metade do preço por calcinha. Vale super a pena levar duas!"
+
+📊 DOWNSELL (se cliente pergunta MAIS depois de ver oferta menor):  
+Exemplo: Cliente viu 1 unidade, agora pergunta preço de 2:
+"Duas calcinhas sairiam R$ 178,80 pelo preço normal... Mas posso fazer um desconto especial e deixar por R$ 119,90! É uma super economia, né?"
+
+🎯 REGRAS DAS ESTRATÉGIAS:
+- SEMPRE compare valor por unidade para mostrar vantagem
+- SEMPRE mencione "desconto especial" quando oferecer kit
+- SEMPRE enfatize a economia: "vale muito mais a pena"
+- Use linguagem natural e persuasiva, não robótica
+
+�🚨 PROIBIDO INVENTAR COMBINAÇÕES:
+❌ "3 por R$ 89,90" (NÃO EXISTE!)
+❌ "2 por R$ 89,90" (NÃO EXISTE!)  
+❌ "5 unidades por qualquer preço" (NÃO EXISTE!)
+✅ APENAS: ${quantity} unidade${quantity > 1 ? 's' : ''} por ${mainPrice}
 
 🔍 REGRA FUNDAMENTAL - CONTEXTO COMPLETO:
 ANTES DE RESPONDER, VOCÊ DEVE:
@@ -944,14 +1026,40 @@ function buildClientPromptWithDynamicPricing(pricingArm?: any): string {
   let mainPrice = 'R$ 89,90'
   let quantity = 1
   
+  // 🚨 TABELA OFICIAL DE PREÇOS (ÚNICA FONTE VERDADEIRA)
+  const OFFICIAL_PRICES = {
+    1: ['R$ 89,90', 'R$ 97,00'],
+    2: ['R$ 119,90', 'R$ 129,90', 'R$ 139,90', 'R$ 147,00'],
+    3: ['R$ 159,90', 'R$ 169,90', 'R$ 179,90', 'R$ 187,00'],
+    4: ['R$ 239,90'],
+    6: ['R$ 359,90']
+  }
+  
   if (pricingArm?.context) {
     const strategy = pricingArm.context
-    // Formatar preço corretamente
-    const rawPrice = strategy.price || 89.9
-    mainPrice = typeof rawPrice === 'number' ? 
-      `R$ ${rawPrice.toFixed(2).replace('.', ',')}` : 
-      rawPrice
     quantity = strategy.qty || 1
+    
+    // 🚨 VALIDAÇÃO CRÍTICA: Verificar se quantidade e preço são válidos
+    const validPricesForQty = OFFICIAL_PRICES[quantity as keyof typeof OFFICIAL_PRICES]
+    if (!validPricesForQty) {
+      console.error(`❌ QUANTIDADE INVÁLIDA: ${quantity} - usando padrão 1 unidade`)
+      quantity = 1
+      mainPrice = 'R$ 89,90'
+    } else {
+      // Formatar preço corretamente
+      const rawPrice = strategy.price || 89.9
+      const formattedPrice = typeof rawPrice === 'number' ? 
+        `R$ ${rawPrice.toFixed(2).replace('.', ',')}` : 
+        rawPrice
+      
+      // 🚨 VERIFICAÇÃO FINAL: Preço deve estar na lista oficial
+      if (validPricesForQty.includes(formattedPrice)) {
+        mainPrice = formattedPrice
+      } else {
+        console.error(`❌ PREÇO INVÁLIDO: ${formattedPrice} para quantidade ${quantity} - usando primeiro da lista`)
+        mainPrice = validPricesForQty[0]
+      }
+    }
     
     // VERIFICAR se a quantidade do arm corresponde à quantidade solicitada
     if (quantity !== strategy.qty) {
@@ -1022,11 +1130,34 @@ NUNCA NUNCA NUNCA confirme pedido sem ter TODOS estes 6 dados:
 📦 PRODUTO:
 Calcinha Modeladora ShapeFit${priceStrategy}
 
-🚨 REGRA CRÍTICA DE PREÇOS:
-- JAMAIS invente preços diferentes dos informados
-- SEMPRE mencione quantidade + preço juntos
-- Exemplo: "3 unidades por R$ 169,90" (NUNCA "1 unidade por R$ 169,90")
-- Se não souber o preço exato, diga "Vou consultar os valores atualizados"
+🚨🚨🚨 REGRA CRÍTICA DE PREÇOS - LEIA COM ATENÇÃO 🚨🚨🚨
+
+VOCÊ ESTÁ PROIBIDO DE INVENTAR PREÇOS! SÓ PODE USAR ESTES PREÇOS:
+
+📋 TABELA DE PREÇOS OFICIAL (ÚNICA PERMITIDA):
+1 unidade: R$ 89,90 OU R$ 97,00
+2 unidades: R$ 119,90 OU R$ 129,90 OU R$ 139,90 OU R$ 147,00  
+3 unidades: R$ 159,90 OU R$ 169,90 OU R$ 179,90 OU R$ 187,00
+4 unidades: R$ 239,90
+6 unidades: R$ 359,90
+
+🚨 REGRAS ABSOLUTAS:
+- JAMAIS invente combinações diferentes (ex: 3 por R$ 89,90 = PROIBIDO!)
+- JAMAIS invente preços fora da tabela
+- SEMPRE escolha UM preço da tabela para a quantidade
+- Se cliente pedir quantidade não listada, ofereça a mais próxima
+- SEMPRE mencione quantidade + preço juntos da tabela
+- Se não souber qual preço usar da tabela, diga "Vou consultar os valores atualizados"
+
+❌ EXEMPLOS PROIBIDOS:
+- "3 por R$ 89,90" (NÃO EXISTE!)
+- "2 por R$ 89,90" (NÃO EXISTE!)
+- "5 unidades por R$ 200" (NÃO EXISTE!)
+
+✅ EXEMPLOS CORRETOS:
+- "1 unidade por R$ 89,90"
+- "2 unidades por R$ 119,90"  
+- "3 unidades por R$ 159,90"
 
 ✨ COMO FALAR DOS BENEFÍCIOS (naturalmente):
 ❌ "Modela cintura e bumbum instantaneamente"
@@ -1047,7 +1178,28 @@ SE o cliente mencionar que "o anúncio dizia 3 por 1" ou "vi que era 3 por 1":
 - Preço EXATO: 2 por R$ 119,90
 - Perguntar se aceita para engajar
 
-🎨 REGRA ABSOLUTA - COR É OBRIGATÓRIA:
+� ESTRATÉGIAS DE VENDAS INTELIGENTES:
+
+📈 UPSELL (cliente pergunta 1 → oferece 2):
+SE cliente perguntar preço de 1 unidade DEPOIS de você já ter mencionado, use esta estratégia:
+"Uma calcinha sai R$ 89,90 mesmo. Mas duas calcinha ficaria R$ 178,80... Porém posso fazer um desconto especial e deixar duas por R$ 119,90! Compensa muito mais, né?"
+
+📉 DOWNSELL (cliente pergunta 1 depois de ver preço de 2):
+SE cliente quiser 1 DEPOIS de você ter oferecido 2 unidades:
+"Ah, duas é no valor promocional! Uma sozinha sai R$ 89,90 (que é mais caro por unidade). Vale muito mais a pena levar duas por R$ 119,90, você economiza bastante!"
+
+🎯 ESTRATÉGIA DE DESCONTO PROGRESSIVO:
+- Para 1 unidade: SEMPRE mencione que 2 sai mais barato por unidade
+- Para 2 unidades: SEMPRE mencione que é preço promocional vs 1 unidade
+- Para 3 unidades: Explique o super desconto por ser kit família
+
+💡 FRASES ESTRATÉGICAS:
+- "Compensa muito mais levar duas!"
+- "É mais barato por unidade"
+- "Valor promocional só para kit"
+- "Desconto especial que posso fazer"
+
+�🎨 REGRA ABSOLUTA - COR É OBRIGATÓRIA:
 ❌ JAMAIS finalize pedido sem perguntar a cor
 ❌ JAMAIS confirme venda sem ter: nome + cidade + cor
 ✅ SEMPRE pergunte: "Qual cor você prefere: bege ou preta?"
@@ -1208,6 +1360,9 @@ export async function processConversationMessage(
     // ✅ ADMIN REATIVADO - todos os poderes restaurados! (mas pode ser desabilitado para teste)
     const isAdmin = ADMIN_CHECK_ENABLED && ADMIN_PHONE && normalizedPhone.includes(ADMIN_PHONE.replace(/\D+/g, ''))
     
+    // ✅ SANITIZAÇÃO DE INPUT DO USUÁRIO
+    const sanitizedMessage = userMessage ? sanitizeUserInput(userMessage) : ''
+    
     // 🔍 DEBUG LOGS
     console.log('🔍 CONVERSATION DEBUG:')
     console.log('   📞 Phone recebido:', phone)
@@ -1215,22 +1370,23 @@ export async function processConversationMessage(
     console.log('   📞 ADMIN_PHONE env:', ADMIN_PHONE)
     console.log('   🧪 ADMIN_CHECK habilitado?:', ADMIN_CHECK_ENABLED)
     console.log('   👑 É admin?:', isAdmin, ADMIN_CHECK_ENABLED ? '(SISTEMA REATIVADO!)' : '(TESTE COMO CLIENTE)')
-    console.log('   💬 Mensagem:', userMessage)
+    console.log('   💬 Mensagem original:', userMessage)
+    console.log('   🛡️ Mensagem sanitizada:', sanitizedMessage)
     console.log('   📸 Mídia:', mediaUrl ? 'Presente' : 'Ausente')
     
-    // � FILTRO: Ignorar mensagens vazias ou do tipo 'list' (menus automáticos)
-    if (!userMessage || userMessage.trim() === '') {
+    // 🚫 FILTRO: Ignorar mensagens vazias ou do tipo 'list' (menus automáticos)
+    if (!sanitizedMessage || sanitizedMessage.trim() === '') {
       console.log('🚫 MENSAGEM VAZIA IGNORADA - Possível menu automático ou spam')
-      return null // Não responder a mensagens vazias
+      return 'Mensagem vazia ignorada' // Não responder a mensagens vazias
     }
     
-    // �📊 Incrementa contador se não for admin
+    // 📊 Incrementa contador se não for admin
     if (!isAdmin) {
       AdminReportingSystem.incrementConversation()
     }
     
     // 🎬 Processa mídia se presente
-    let processedMessage = userMessage || ''
+    let processedMessage = sanitizedMessage || ''
     let mediaAnalysis = ''
     
     if (mediaUrl && mediaType) {
@@ -1380,25 +1536,80 @@ async function processAdminMessage(phone: string, message: string): Promise<stri
     saveMessageToDB(conversationId, 'inbound', message, phone) // Salva a mensagem original, não a enhanced
     console.log(`💬 Mensagem adicionada à thread de ${phone} - total: ${conversation.length} mensagens`)
     
+    // 🎯 Detectar mudanças de quantidade antes de processar com GPT
+    const quantityChange = detectQuantityChange(message, conversation.map(msg => ({
+      role: msg.role,
+      content: msg.content,
+      timestamp: new Date().toISOString()
+    })))
+    
+    // Se detectou mudança de quantidade com estratégia, usar resposta estratégica
+    if (quantityChange.detected && quantityChange.strategicResponse) {
+      console.log(`🎯 APLICANDO ESTRATÉGIA ${quantityChange.strategy?.toUpperCase()}: ${quantityChange.fromQuantity} → ${quantityChange.toQuantity}`)
+      
+      const strategicMessage = quantityChange.strategicResponse
+      
+      // Adicionar resposta estratégica à conversa
+      conversation.push({ role: 'assistant', content: strategicMessage })
+      activeConversations.set(phone, conversation)
+      
+      // Salvar no banco
+      saveMessageToDB(conversationId, 'outbound', strategicMessage, phone)
+      
+      // Aplicar validação de preço na resposta estratégica (sem autorização específica)
+      const validatedResponse = validateResponsePricing(strategicMessage, '')
+      
+      console.log(`📤 Enviando resposta estratégica para ${phone}:`, validatedResponse)
+      // Note: O envio real da mensagem será feito pela função que chama esta
+      
+      return validatedResponse
+    }
+    
     console.log('🚀 Processando com GPT-4o...')
     
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: conversation,
-      temperature: 0.7,
-      max_tokens: 400,
+    // ✅ CORREÇÃO: Timeout de 30s para evitar travamentos
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('OpenAI_Timeout')), 30000)
     })
     
-    const assistantMessage = completion.choices[0]?.message?.content || 'Problema técnico, chefe animal!'
+  try {
+    const completion = await Promise.race([
+      openai.chat.completions.create({
+        model: 'gpt-4o',
+        messages: conversation,
+        temperature: 0.7,
+        max_tokens: 400,
+      }),
+      timeoutPromise
+    ]) as any // ✅ Type assertion para resolver conflito
     
-    conversation.push({ role: 'assistant', content: assistantMessage })
-    activeConversations.set(phone, conversation)
+    // ✅ CORREÇÃO: Null check antes de acessar propriedades
+    if (!completion || !completion.choices || completion.choices.length === 0) {
+      console.error('❌ OpenAI retornou resposta vazia')
+      return 'Desculpe, tive um problema técnico! Pode tentar novamente? 🤖'
+    }
     
-    // 💾 Salva resposta do bot no banco
-    saveMessageToDB(conversationId, 'outbound', assistantMessage, phone)
+    const assistantMessage = completion.choices[0]?.message?.content
+    if (!assistantMessage) {
+      console.error('❌ OpenAI retornou mensagem vazia')
+      return 'Ops! Não consegui processar sua mensagem. Tenta de novo? 😅'
+    }      conversation.push({ role: 'assistant', content: assistantMessage })
+      activeConversations.set(phone, conversation)
     
-    console.log('💬 Resposta DEVASTADORA gerada:', assistantMessage)
-    return assistantMessage
+      // 💾 Salva resposta do bot no banco
+      saveMessageToDB(conversationId, 'outbound', assistantMessage, phone)
+    
+      console.log('💬 Resposta DEVASTADORA gerada:', assistantMessage)
+      return assistantMessage
+    
+    } catch (openaiError: any) {
+      if (openaiError.message === 'OpenAI_Timeout') {
+        console.error('❌ OpenAI Timeout após 30s')
+        return 'Desculpe, estou um pouco lento hoje! Tente novamente em alguns segundos! 🐌'
+      }
+      console.error('❌ Erro OpenAI:', openaiError)
+      return 'Ops! Tive um problema técnico. Pode tentar novamente? 🤖'
+    }
     
   } catch (error) {
     console.error('❌ Erro crítico no SUPER ADMIN:', error)
@@ -3895,6 +4106,150 @@ async function gatherAdvancedSystemData(message: string): Promise<string | null>
  * 👥 Processa mensagens de clientes
  */
 /**
+ * 🎯 Detecta mudanças de quantidade e aplica estratégias de upsell/downsell
+ */
+function detectQuantityChange(message: string, currentConversation: ConversationMessage[]): {
+  detected: boolean
+  strategy: 'upsell' | 'downsell' | null
+  fromQuantity: number | null
+  toQuantity: number | null
+  strategicResponse: string | null
+} {
+  const newQuantity = extractRequestedQuantity(message)
+  if (!newQuantity) {
+    return { detected: false, strategy: null, fromQuantity: null, toQuantity: null, strategicResponse: null }
+  }
+  
+  // Buscar quantidade mencionada anteriormente na conversa
+  let previousQuantity: number | null = null
+  
+  for (let i = currentConversation.length - 1; i >= 0; i--) {
+    const msg = currentConversation[i]
+    if (msg.role === 'assistant') {
+      // Verificar se bot mencionou alguma quantidade específica
+      const qtyMatch = msg.content.match(/(\d+)\s*(?:unidade|calcinha|peça)/i)
+      if (qtyMatch) {
+        previousQuantity = parseInt(qtyMatch[1])
+        break
+      }
+    }
+  }
+  
+  if (!previousQuantity || previousQuantity === newQuantity) {
+    return { detected: false, strategy: null, fromQuantity: null, toQuantity: null, strategicResponse: null }
+  }
+  
+  console.log(`🎯 MUDANÇA DE QUANTIDADE DETECTADA: ${previousQuantity} → ${newQuantity}`)
+  
+  // Determinar estratégia baseada na mudança
+  let strategy: 'upsell' | 'downsell' = previousQuantity < newQuantity ? 'upsell' : 'downsell'
+  let strategicResponse = ''
+  
+  if (strategy === 'upsell' && previousQuantity === 1 && newQuantity === 2) {
+    // Cliente viu 1, agora quer 2 - estratégia de desconto especial
+    strategicResponse = `Duas calcinhas ficaria R$ ${(89.90 * 2).toFixed(2).replace('.', ',')} pelo preço normal... Mas posso fazer um desconto especial e deixar duas por R$ 119,90! É uma super economia, compensa muito mais! 😊`
+  }
+  else if (strategy === 'downsell' && previousQuantity === 2 && newQuantity === 1) {
+    // Cliente viu 2, agora quer 1 - enfatizar que 2 é promocional
+    strategicResponse = `Ah, uma sozinha sai R$ 89,90, mas duas por R$ 119,90 é MUITO mais vantajoso! É praticamente metade do preço por calcinha. Vale super a pena levar duas! 💡`
+  }
+  else if (strategy === 'upsell' && previousQuantity === 2 && newQuantity === 3) {
+    // Cliente viu 2, agora quer 3 - estratégia para kit família
+    strategicResponse = `Três calcinhas seria R$ ${(119.90 * 1.5).toFixed(2).replace('.', ',')} pelo cálculo normal... Mas no kit família posso deixar três por R$ 159,90! É o melhor custo-benefício! 🔥`
+  }
+  else if (strategy === 'downsell' && previousQuantity === 3 && newQuantity === 2) {
+    // Cliente viu 3, agora quer 2
+    strategicResponse = `Duas unidades fica R$ 119,90. Mas três por R$ 159,90 é muito mais vantajoso - só R$ 40 a mais por uma calcinha extra! Vale super a pena! ✨`
+  }
+  
+  return {
+    detected: true,
+    strategy,
+    fromQuantity: previousQuantity,
+    toQuantity: newQuantity,
+    strategicResponse: strategicResponse || null
+  }
+}
+
+/**
+ * 🚨 VALIDAÇÃO CRÍTICA DE PREÇOS - Remove preços inventados pelo GPT
+ */
+function validateResponsePricing(botResponse: string, authorizedPrice: string): string {
+  try {
+    console.log(`🔍 VALIDANDO PREÇOS NA RESPOSTA: "${botResponse}"`)
+    console.log(`🔍 PREÇO AUTORIZADO: ${authorizedPrice}`)
+    
+    // 🚨 TABELA OFICIAL DE PREÇOS (ÚNICA FONTE VERDADEIRA)
+    const OFFICIAL_PRICES = [
+      'R$ 89,90', 'R$ 97,00',           // 1 unidade
+      'R$ 119,90', 'R$ 129,90', 'R$ 139,90', 'R$ 147,00',  // 2 unidades
+      'R$ 159,90', 'R$ 169,90', 'R$ 179,90', 'R$ 187,00',  // 3 unidades
+      'R$ 239,90',                      // 4 unidades
+      'R$ 359,90'                       // 6 unidades
+    ]
+    
+    // Detectar todos os preços na mensagem
+    const priceRegex = /R\$\s*\d{1,3}(?:,\d{2})?/gi
+    const foundPrices = botResponse.match(priceRegex) || []
+    
+    console.log(`🔍 PREÇOS ENCONTRADOS: ${foundPrices.join(', ')}`)
+    
+    let validatedResponse = botResponse
+    let hasInvalidPrice = false
+    
+    // Verificar cada preço encontrado
+    for (const price of foundPrices) {
+      const normalizedPrice = price.replace(/\s+/g, ' ')
+      
+      if (!OFFICIAL_PRICES.includes(normalizedPrice)) {
+        console.error(`❌ PREÇO INVÁLIDO DETECTADO: ${normalizedPrice}`)
+        hasInvalidPrice = true
+        
+        // Substituir preço inválido pelo autorizado
+        validatedResponse = validatedResponse.replace(price, authorizedPrice)
+        console.log(`🔄 SUBSTITUÍDO: ${price} → ${authorizedPrice}`)
+      } else {
+        console.log(`✅ PREÇO VÁLIDO: ${normalizedPrice}`)
+      }
+    }
+    
+    // 🚨 DETECTAR COMBINAÇÕES PROIBIDAS ESPECÍFICAS
+    const forbiddenCombinations = [
+      /(?:três|3)\s*(?:por|unidade|calcinha|unidades).*?R\$\s*89,90/i,  // 3 por R$ 89,90
+      /(?:duas|2)\s*(?:por|unidade|calcinha|unidades).*?R\$\s*89,90/i,  // 2 por R$ 89,90
+      /(?:três|3)\s*(?:por|unidade|calcinha|unidades).*?R\$\s*97,00/i,  // 3 por R$ 97,00
+      /(?:duas|2)\s*(?:por|unidade|calcinha|unidades).*?R\$\s*97,00/i,  // 2 por R$ 97,00
+      /(?:cinco|5)\s*(?:por|unidade|calcinha|unidades)/i,               // 5 unidades (não existe)
+      /(?:sete|7)\s*(?:por|unidade|calcinha|unidades)/i,                // 7 unidades (não existe)
+    ]
+    
+    for (const forbidden of forbiddenCombinations) {
+      if (forbidden.test(validatedResponse)) {
+        console.error(`❌ COMBINAÇÃO PROIBIDA DETECTADA: ${forbidden}`)
+        hasInvalidPrice = true
+        
+        // Substituir por mensagem segura
+        validatedResponse = 'Vou consultar os valores atualizados para você! Qual quantidade você tem interesse? Temos opções de 1, 2 ou 3 unidades.'
+        console.log(`🔄 RESPOSTA SUBSTITUÍDA POR SEGURANÇA`)
+        break
+      }
+    }
+    
+    if (hasInvalidPrice) {
+      console.error(`🚨 PREÇOS INVÁLIDOS CORRIGIDOS NA RESPOSTA!`)
+      console.error(`📋 RESPOSTA ORIGINAL: "${botResponse}"`)
+      console.error(`📋 RESPOSTA CORRIGIDA: "${validatedResponse}"`)
+    }
+    
+    return validatedResponse
+    
+  } catch (error) {
+    console.error(`❌ Erro na validação de preços:`, error)
+    return botResponse // Retorna original se der erro
+  }
+}
+
+/**
  * � Detecta sinais de desistência do cliente
  */
 function detectCustomerDisinterest(message: string, conversationHistory: any[]): boolean {
@@ -3934,34 +4289,6 @@ function detectCustomerDisinterest(message: string, conversationHistory: any[]):
   }
   
   return false
-}
-
-/**
- * 🔍 Valida resposta para não inventar preços
- */
-function validateResponsePricing(response: string, authorizedPrice: string): string {
-  // Padrão para detectar preços brasileiros
-  const pricePattern = /R\$\s*\d+[,.]?\d*/g
-  const mentionedPrices = response.match(pricePattern) || []
-  
-  if (mentionedPrices.length > 0) {
-    console.log(`🔍 Preços encontrados na resposta: ${mentionedPrices.join(', ')}`)
-    console.log(`💰 Preço autorizado pelo ML: ${authorizedPrice}`)
-    
-    // Verificar se algum preço não é o autorizado
-    for (const price of mentionedPrices) {
-      const cleanPrice = price.replace(/[^\d,]/g, '')
-      const cleanAuthorized = authorizedPrice.replace(/[^\d,]/g, '')
-      
-      if (cleanPrice !== cleanAuthorized) {
-        console.error(`🚨 BOT TENTOU INVENTAR PREÇO: ${price} (autorizado: ${authorizedPrice})`)
-        // Substituir por preço autorizado
-        response = response.replace(price, authorizedPrice)
-      }
-    }
-  }
-  
-  return response
 }
 
 /**
@@ -4769,23 +5096,62 @@ Se cliente confirmou a compra, apenas finalize dizendo que o pedido foi anotado 
     console.log(`🎯 CONTEXTO ADICIONADO: Dados já coletados - evitando re-coleta`)
   }
   
-  const completion = await openai.chat.completions.create({
-    model,
-    messages: conversationWithContext, // ✅ THREAD COMPLETA + contexto de dados coletados
-    temperature: 0.7,
-    max_tokens: 250, // 🔧 AJUSTADO para mensagens mais concisas para clientes (tamanho ideal)
+  // ✅ CORREÇÃO: Timeout de 30s para evitar travamentos
+  const timeoutPromise = new Promise((_, reject) => {
+    setTimeout(() => reject(new Error('OpenAI_Timeout')), 30000)
   })
   
-  console.log(`🔍 GPT COMPLETION - choices length: ${completion.choices?.length || 0}`)
-  console.log(`🔍 GPT COMPLETION - first choice:`, completion.choices?.[0])
+  let assistantMessage = 'Desculpe, não entendi. Pode repetir?' // ✅ Declaração fora do try
   
-  let assistantMessage = completion.choices[0]?.message?.content || 'Desculpe, não entendi. Pode repetir?'
+  try {
+    const completion = await Promise.race([
+      openai.chat.completions.create({
+        model,
+        messages: conversationWithContext, // ✅ THREAD COMPLETA + contexto de dados coletados
+        temperature: 0.7,
+        max_tokens: 250, // 🔧 AJUSTADO para mensagens mais concisas para clientes (tamanho ideal)
+      }),
+      timeoutPromise
+    ]) as any // ✅ Type assertion para resolver conflito
+  
+    console.log(`🔍 GPT COMPLETION - choices length: ${completion.choices?.length || 0}`)
+    console.log(`🔍 GPT COMPLETION - first choice:`, completion.choices?.[0])
+  
+    // ✅ CORREÇÃO: Null check antes de acessar propriedades
+    if (!completion || !completion.choices || completion.choices.length === 0) {
+      console.error('❌ OpenAI retornou resposta vazia')
+      return 'Desculpe, tive um problema técnico! Pode tentar novamente? 🤖'
+    }
+  
+    const messageContent = completion.choices[0]?.message?.content
+    if (!messageContent) {
+      console.error('❌ OpenAI retornou mensagem vazia')
+      assistantMessage = 'Desculpe, não entendi. Pode repetir?'
+    } else {
+      assistantMessage = messageContent
+    }
+  
+  } catch (openaiError: any) {
+    if (openaiError.message === 'OpenAI_Timeout') {
+      console.error('❌ OpenAI Timeout após 30s')
+      return 'Desculpe, estou um pouco lento hoje! Tente novamente em alguns segundos! 🐌'
+    }
+    console.error('❌ Erro OpenAI:', openaiError)
+    return 'Ops! Tive um problema técnico. Pode tentar novamente? 🤖'
+  }
   
   // 🔍 VALIDAÇÃO DE PREÇOS - Garantir que só use preços autorizados pelo ML
   const authorizedPrice = finalPricingArm?.context?.price ? 
     `R$ ${finalPricingArm.context.price.toFixed(2).replace('.', ',')}` : 'R$ 89,90'
   
+  console.log(`🚨 EXECUTANDO VALIDAÇÃO DE PREÇOS:`)
+  console.log(`📋 Resposta ANTES da validação: "${assistantMessage}"`)
+  console.log(`💰 Preço autorizado: ${authorizedPrice}`)
+  
   assistantMessage = validateResponsePricing(assistantMessage, authorizedPrice)
+  
+  console.log(`📋 Resposta APÓS validação: "${assistantMessage}"`)
+  console.log(`✅ VALIDAÇÃO DE PREÇOS CONCLUÍDA`)
   
   // Validação crítica: resposta do GPT não pode estar vazia
   console.log(`🔍 GPT RESPOSTA RAW: "${assistantMessage}"`)
@@ -4793,7 +5159,7 @@ Se cliente confirmou a compra, apenas finalize dizendo que o pedido foi anotado 
     console.error('🚨 GPT RETORNOU RESPOSTA VAZIA!')
     console.error(`📞 Phone: ${phone}`)
     console.error(`💬 Mensagem do usuário: "${message}"`)
-    console.error(`🤖 Completion recebida:`, completion.choices[0])
+    // console.error(`🤖 Completion recebida:`, completion.choices[0]) // ✅ Removido - completion fora do scope
     assistantMessage = 'Oi! Tive um probleminha técnico, mas posso te ajudar! Como posso te auxiliar? 😊'
     console.log(`🔄 Usando fallback GPT: "${assistantMessage}"`)
   }
@@ -5469,14 +5835,42 @@ async function startFinalConfirmation(phone: string, customerData: CustomerProfi
     // Obter preço inteligente baseado no ML
     const { calcinhaMLPricing } = await import('../ml/calcinhaMLPricing.js')
     
-    // Usar quantidade já escolhida pelo cliente
-    const quantity = customerData.quantity || 1
-    const priceResult = await calcinhaMLPricing.getSmartPrice(quantity, {
-      phone,
-      location: customerData.city || 'São Paulo',
-      previousPurchases: 0,
-      interactions: customerData.messageCount || 1
-    }, customerData.campaignId)
+    // Usar quantidade já escolhida pelo cliente (garantir tipo correto)
+    const quantity = Math.min(Math.max(customerData.quantity || 1, 1), 6) as 1 | 2 | 3 | 4 | 6
+    
+    // 🎯 VERIFICAR CACHE DE PREÇO PARA CONSISTÊNCIA NA CONVERSA
+    let priceResult: any
+    const cachedPrice = conversationPrices.get(phone)
+    
+    if (cachedPrice && cachedPrice.quantity === quantity) {
+      // Usar preço já estabelecido nesta conversa
+      console.log(`💰 USANDO PREÇO CACHED para ${phone}: ${quantity}x = R$ ${cachedPrice.price.toFixed(2).replace('.', ',')}`)
+      priceResult = {
+        price: cachedPrice.price,
+        originalPrice: cachedPrice.originalPrice,
+        discount: cachedPrice.originalPrice - cachedPrice.price,
+        variant: { color: 'preta' } // Default para manter compatibilidade
+      }
+    } else {
+      // Primeiro preço para esta quantidade - usar ML
+      console.log(`🎲 GERANDO NOVO PREÇO ML para ${phone}: ${quantity} unidades`)
+      priceResult = await calcinhaMLPricing.getSmartPrice(quantity, {
+        phone,
+        location: customerData.city || 'São Paulo',
+        previousPurchases: 0,
+        interactions: customerData.messageCount || 1
+      }, customerData.campaignId)
+      
+      // Salvar no cache para manter consistência
+      conversationPrices.set(phone, {
+        quantity,
+        price: priceResult.price,
+        originalPrice: priceResult.originalPrice,
+        timestamp: Date.now()
+      })
+      
+      console.log(`💾 PREÇO SALVO NO CACHE: ${quantity}x = R$ ${priceResult.price.toFixed(2).replace('.', ',')}`)
+    }
 
     // Salvar dados para confirmação
     await saveConfirmationData(phone, {
